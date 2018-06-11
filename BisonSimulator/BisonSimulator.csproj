@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5A96FECB-EE53-4562-A7CF-D9C96BAF9C42}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Sowalabs.Bison.ProfitSim</RootNamespace>
+    <AssemblyName>Bison.ProfitSim</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Dependencies\SimulatedBankApi.cs" />
+    <Compile Include="Dependencies\SimTimer.cs" />
+    <Compile Include="Dependencies\SimulatedTimerFactory.cs" />
+    <Compile Include="Dependencies\SimulationDependencyFactory.cs" />
+    <Compile Include="Events\ISimEvent.cs" />
+    <Compile Include="Events\NewPriceRequestEvent.cs" />
+    <Compile Include="Events\OrderBookEvent.cs" />
+    <Compile Include="Events\OfferAcceptedEvent.cs" />
+    <Compile Include="Events\OfferRejectedEvent.cs" />
+    <Compile Include="Events\TimerEvent.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="IO\Bitstamp\BitstampHistoryLoader.cs" />
+    <Compile Include="IO\Bitstamp\Model\Offer.cs" />
+    <Compile Include="IO\Bitstamp\Model\Order.cs" />
+    <Compile Include="IO\Bitstamp\Model\OrderBook.cs" />
+    <Compile Include="ProfitResultForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProfitResultForm.Designer.cs">
+      <DependentUpon>ProfitResultForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProfitSimForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProfitSimForm.Designer.cs">
+      <DependentUpon>ProfitSimForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\SimulationCase.cs" />
+    <Compile Include="Model\ProfitSimulationResult.cs" />
+    <Compile Include="Model\User.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProfitSimulator.cs" />
+    <Compile Include="Dependencies\SimulatedMarketApi.cs" />
+    <Compile Include="SimEventQueue.cs" />
+    <Compile Include="SimulationEngine.cs" />
+    <Compile Include="SimulationPropertySetter.cs" />
+    <EmbeddedResource Include="ProfitResultForm.resx">
+      <DependentUpon>ProfitResultForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProfitSimForm.resx">
+      <DependentUpon>ProfitSimForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{a522df1a-c979-4662-a3a1-0b3abca62a11}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Hedger\Hedger.csproj">
+      <Project>{6548b153-c137-45f5-9d64-3f7854a9a81c}</Project>
+      <Name>Hedger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LiquidityEngine\LiquidityEngine.csproj">
+      <Project>{62ac9acf-7811-4257-a380-0ce7467b85d0}</Project>
+      <Name>LiquidityEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Pricing\Princing.csproj">
+      <Project>{5bda1f96-4ffb-4c20-be04-484472eba7ae}</Project>
+      <Name>Princing</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\DataSources\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

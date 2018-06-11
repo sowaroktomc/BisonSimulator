@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BisonSimulator", "BisonSimulator\BisonSimulator.csproj", "{5A96FECB-EE53-4562-A7CF-D9C96BAF9C42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Princing", "Pricing\Princing.csproj", "{5BDA1F96-4FFB-4C20-BE04-484472EBA7AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hedger", "Hedger\Hedger.csproj", "{6548B153-C137-45F5-9D64-3F7854A9A81C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiquidityEngine", "LiquidityEngine\LiquidityEngine.csproj", "{62AC9ACF-7811-4257-A380-0CE7467B85D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{A522DF1A-C979-4662-A3A1-0B3ABCA62A11}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A96FECB-EE53-4562-A7CF-D9C96BAF9C42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A96FECB-EE53-4562-A7CF-D9C96BAF9C42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A96FECB-EE53-4562-A7CF-D9C96BAF9C42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A96FECB-EE53-4562-A7CF-D9C96BAF9C42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BDA1F96-4FFB-4C20-BE04-484472EBA7AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BDA1F96-4FFB-4C20-BE04-484472EBA7AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BDA1F96-4FFB-4C20-BE04-484472EBA7AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BDA1F96-4FFB-4C20-BE04-484472EBA7AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6548B153-C137-45F5-9D64-3F7854A9A81C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6548B153-C137-45F5-9D64-3F7854A9A81C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6548B153-C137-45F5-9D64-3F7854A9A81C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6548B153-C137-45F5-9D64-3F7854A9A81C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62AC9ACF-7811-4257-A380-0CE7467B85D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62AC9ACF-7811-4257-A380-0CE7467B85D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62AC9ACF-7811-4257-A380-0CE7467B85D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62AC9ACF-7811-4257-A380-0CE7467B85D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A522DF1A-C979-4662-A3A1-0B3ABCA62A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A522DF1A-C979-4662-A3A1-0B3ABCA62A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A522DF1A-C979-4662-A3A1-0B3ABCA62A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A522DF1A-C979-4662-A3A1-0B3ABCA62A11}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1AF31AEC-3730-4962-9A24-30157A7F818E}
+	EndGlobalSection
+EndGlobal
