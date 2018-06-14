@@ -40,6 +40,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BisonApi\IHedgingService.cs" />
+    <Compile Include="BisonApi\ILiquidityProviderService.cs" />
+    <Compile Include="BisonApi\IPricingService.cs" />
+    <Compile Include="Environment\AccountData.cs" />
+    <Compile Include="Environment\BankData.cs" />
+    <Compile Include="Environment\Currency.cs" />
+    <Compile Include="Environment\EuwaxData.cs" />
+    <Compile Include="Environment\MarketData.cs" />
+    <Compile Include="Environment\Market.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="Extensions\OrderBookExtensions.cs" />
     <Compile Include="Trading\BuySell.cs" />

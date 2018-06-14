@@ -28,7 +28,6 @@ namespace Sowalabs.Bison.ProfitSim
 
             var result = this._simulator.ExecuteProfitSimulation();
             var frm = new ProfitResultForm(result);
-            frm.Closed += (o, args) => frm.Dispose();
             frm.Show();
         }
     }

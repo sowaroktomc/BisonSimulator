@@ -5,6 +5,8 @@ using Sowalabs.Bison.ProfitSim.IO.Bitstamp;
 using Sowalabs.Bison.ProfitSim.Model;
 using System;
 using System.Collections.Generic;
+using Sowalabs.Bison.Common;
+using Sowalabs.Bison.ProfitSim.IO;
 
 namespace Sowalabs.Bison.ProfitSim
 {
@@ -31,8 +33,8 @@ namespace Sowalabs.Bison.ProfitSim
         /// </summary>
         public int HedgingDelay
         {
-            get => (int)this._dependencyFactory.HedgingEngine.WhenStrategy.Delay;
-            set => this._dependencyFactory.HedgingEngine.WhenStrategy.Delay = value;
+            get => (int)this._dependencyFactory.HedgingEngine.WhenStrategy.Delay / 1000;
+            set => this._dependencyFactory.HedgingEngine.WhenStrategy.Delay = value * 1000;
         }
 
         /// <summary>
@@ -71,14 +73,15 @@ namespace Sowalabs.Bison.ProfitSim
         {
             this.OrderSizes = new List<decimal>();
             this._dependencyFactory = new SimulationDependencyFactory();
+            SimulationLiquidityEngineQueue.EnsureInstanceCreated();
 
             this.ReservationPeriod = 10;
             this.HedgingDelay = 0;
             this.OfferAcceptanceRate = 100;
             this.SimulatedTime = 600;
-            this.NumUsers = 1000;
-            this.BuySpread = 5;
-            this.SellSpread = 5;
+            this.NumUsers = 1;
+            this.BuySpread = 0.2m;
+            this.SellSpread = 0.2m;
         }
 
         public ProfitSimulationResult ExecuteProfitSimulation()
@@ -86,16 +89,18 @@ namespace Sowalabs.Bison.ProfitSim
             var result = new ProfitSimulationResult();
 
             var historyLoader = new BitstampHistoryLoader();
+            var historyEnumerator = new HistoryEnumerator(historyLoader);
+            var marketAnalyzer = new MarketAnalyzer(new HistoryQueue(historyLoader));
             var users = this.CreateUsers();
 
             var executeSimulation = true;
 
-            SimulationEngine.Instance.AfterEventSimulation += (sender, args) =>
+            void Action(object sender, EventArgs<ISimEvent> args)
             {
                 var lastEvent = SimulationEngine.Instance.PeekLastEvent();
                 while (lastEvent != null && !(lastEvent is OrderBookEvent))
                 {
-                    var nextOrderBook = historyLoader.GetNext();
+                    var nextOrderBook = historyEnumerator.GetNext();
                     if (nextOrderBook == null)
                     {
                         executeSimulation = false;
@@ -108,22 +113,36 @@ namespace Sowalabs.Bison.ProfitSim
 
                     lastEvent = SimulationEngine.Instance.PeekLastEvent();
                 }
-            };
+            }
+
+            SimulationEngine.Instance.AfterEventSimulation += Action;
 
 
             while (executeSimulation)
             {
-                var firstOrderBook = historyLoader.GetNext();
-                SimulationEngine.Instance.AddEvent(new OrderBookEvent(firstOrderBook, this._dependencyFactory.BitcoinMarketApi));
+                var firstOrderBook = historyEnumerator.GetNext();
+
+                if (firstOrderBook == null)
+                {
+                    break;
+                }
+
+                SimulationEngine.Instance.AddEvent(new OrderBookEvent(firstOrderBook, _dependencyFactory.BitcoinMarketApi));
                 users.ForEach(user => user.CreateEvents(this._dependencyFactory, firstOrderBook.AcqTime));
 
                 SimulationEngine.Instance.Execute();
-                result.Profits.Add(this._dependencyFactory.BitcoinMarketApi.MoneyBalance + this._dependencyFactory.SolarisBank.Balance);
-                
+
+                var profit = (_dependencyFactory.BitcoinMarketApi.MoneyBalance + _dependencyFactory.SolarisBank.Balance) / Math.Abs(_dependencyFactory.BitcoinMarketApi.MoneyBalance) * 100;
+                result.Profits.Add(new ProfitSimulationResult.Profit(profit) {Volatility = marketAnalyzer.Volatility, Trend = marketAnalyzer.Trend, Extreme = marketAnalyzer.Extreme});
+
                 this._dependencyFactory.BitcoinMarketApi.Reset();
                 this._dependencyFactory.SolarisBank.Reset();
-                executeSimulation &= historyLoader.Restart();
+                marketAnalyzer.Next();
+                executeSimulation &= historyEnumerator.Restart();
             }
+
+            SimulationEngine.Instance.AfterEventSimulation -= Action;
+
 
             return result;
         }

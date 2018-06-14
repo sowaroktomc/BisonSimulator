@@ -1,6 +1,5 @@
-﻿using System;
-using Sowalabs.Bison.ProfitSim.Dependencies;
-using Sowalabs.Bison.ProfitSim.Model;
+﻿using Sowalabs.Bison.ProfitSim.Dependencies;
+using System;
 
 namespace Sowalabs.Bison.ProfitSim.Events
 {
@@ -9,7 +8,6 @@ namespace Sowalabs.Bison.ProfitSim.Events
 
         private readonly NewPriceRequestEvent _priceRequestEvent;
         private readonly SimulationDependencyFactory _dependencyFactory;
-        public User User { get; set; }
 
         public OfferAcceptedEvent(SimulationDependencyFactory dependencyFactory, NewPriceRequestEvent priceRequestEvent, DateTime acceptAtTime)
         {

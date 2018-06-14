@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Sowalabs.Bison.Common.BisonApi;
 using Sowalabs.Bison.Common.Timer;
 
 namespace Sowalabs.Bison.Hedger.Dependencies
@@ -20,5 +21,9 @@ namespace Sowalabs.Bison.Hedger.Dependencies
         }
 
         public ITimerFactory TimerFactory => this._timerFactory;
+        public IPricingService PricingService
+        {
+            get { return null; }
+        }
     }
 }

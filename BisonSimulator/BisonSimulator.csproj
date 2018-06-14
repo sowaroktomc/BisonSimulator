@@ -65,6 +65,13 @@
     <Compile Include="IO\Bitstamp\Model\Offer.cs" />
     <Compile Include="IO\Bitstamp\Model\Order.cs" />
     <Compile Include="IO\Bitstamp\Model\OrderBook.cs" />
+    <Compile Include="IO\HistoryEnumerator.cs" />
+    <Compile Include="IO\HistoryQueue.cs" />
+    <Compile Include="IO\IHistoryEnumerator.cs" />
+    <Compile Include="MarketAnalyzer.cs" />
+    <Compile Include="Model\MarketExtreme.cs" />
+    <Compile Include="Model\MarketTrend.cs" />
+    <Compile Include="Model\MarketVolatility.cs" />
     <Compile Include="ProfitResultForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,6 +93,7 @@
     <Compile Include="Dependencies\SimulatedMarketApi.cs" />
     <Compile Include="SimEventQueue.cs" />
     <Compile Include="SimulationEngine.cs" />
+    <Compile Include="SimulationLiquidityEngineQueue.cs" />
     <Compile Include="SimulationPropertySetter.cs" />
     <EmbeddedResource Include="ProfitResultForm.resx">
       <DependentUpon>ProfitResultForm.cs</DependentUpon>

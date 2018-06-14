@@ -4,10 +4,11 @@ using Sowalabs.Bison.Hedger.ExecutionStrategies;
 using Sowalabs.Bison.Hedger.WhenStrategies;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Sowalabs.Bison.Common.BisonApi;
 
 namespace Sowalabs.Bison.Hedger
 {
-    public class HedgingEngine
+    public class HedgingEngine : IHedgingService
     {
         private readonly IDependencyFactory _dependencyFactory;
         private readonly List<IWhenStrategy> _whenStrategies = new List<IWhenStrategy>();

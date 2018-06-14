@@ -28,7 +28,7 @@ namespace Sowalabs.Bison.ProfitSim.Model
             var acceptRejectDelay = simStart.AddSeconds(this.RequestDelay + this.AcceptRejectDelay);
             if (this.AcceptsOffer)
             {
-                SimulationEngine.Instance.AddEvent(new OfferAcceptedEvent(dependencyFactory, priceRequest, acceptRejectDelay) { User = this});
+                SimulationEngine.Instance.AddEvent(new OfferAcceptedEvent(dependencyFactory, priceRequest, acceptRejectDelay));
             }
             else
             {

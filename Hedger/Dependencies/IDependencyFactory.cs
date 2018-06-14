@@ -1,4 +1,5 @@
-﻿using Sowalabs.Bison.Common.Timer;
+﻿using Sowalabs.Bison.Common.BisonApi;
+using Sowalabs.Bison.Common.Timer;
 
 namespace Sowalabs.Bison.Hedger.Dependencies
 {
@@ -7,5 +8,8 @@ namespace Sowalabs.Bison.Hedger.Dependencies
         IMarketApi GetMarketApi();
 
         ITimerFactory TimerFactory { get; }
+
+        IPricingService PricingService { get; }
+
     }
 }

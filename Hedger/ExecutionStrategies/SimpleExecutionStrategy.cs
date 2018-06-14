@@ -1,6 +1,5 @@
 ﻿using Sowalabs.Bison.Common.Trading;
 using Sowalabs.Bison.Hedger.Dependencies;
-using System;
 using System.Collections.Generic;
 
 namespace Sowalabs.Bison.Hedger.ExecutionStrategies
@@ -29,6 +28,8 @@ namespace Sowalabs.Bison.Hedger.ExecutionStrategies
                         market.ExecuteSell(offer.Amount, offer.Price);
                         break;
                 }
+
+                this._dependencyFactory.PricingService.MarkOfferExecuted(offer.Id);
 
             }
         }

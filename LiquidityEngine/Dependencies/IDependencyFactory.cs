@@ -2,8 +2,6 @@
 {
     public interface IDependencyFactory
     {
-
-        IBankApi GetSolarisApi();
-
+        IBankApi GetBankApi(string bankSwiftCode);
     }
 }

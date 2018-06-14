@@ -1,9 +1,12 @@
-﻿namespace Sowalabs.Bison.ProfitSim.Dependencies
+﻿using Sowalabs.Bison.Common.BisonApi;
+
+namespace Sowalabs.Bison.ProfitSim.Dependencies
 {
     internal class SimulationDependencyFactory : Pricing.Dependencies.IDependencyFactory, Hedger.Dependencies.IDependencyFactory, LiquidityEngine.Dependencies.IDependencyFactory
     {
         public SimulatedMarketApi BitcoinMarketApi { get; }
         public SimulatedTimerFactory TimerFactory { get; }
+        public IPricingService PricingService => PricingEngine;
 
         public Pricing.PricingEngine PricingEngine { get; }
         public Hedger.HedgingEngine HedgingEngine { get; }
@@ -31,7 +34,7 @@
             return this.BitcoinMarketApi;
         }
 
-        public LiquidityEngine.Dependencies.IBankApi GetSolarisApi()
+        public LiquidityEngine.Dependencies.IBankApi GetBankApi(string bankSwiftCode)
         {
             return this.SolarisBank;
         }

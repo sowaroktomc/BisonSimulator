@@ -7,11 +7,11 @@
 
         public void TransferMoney(string fromAccount, string toAccount, decimal amount)
         {
-            if (toAccount == "EUWAX")
+            if (toAccount.ToUpper().Contains("EUWAX"))
             {
                 this.Balance += amount;
             }
-            if (fromAccount == "EUWAX")
+            if (fromAccount.ToUpper().Contains("EUWAX"))
             {
                 this.Balance -= amount;
             }

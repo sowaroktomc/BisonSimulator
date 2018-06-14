@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sowalabs.Bison.Common.BisonApi;
 using Sowalabs.Bison.Pricing.Data;
 using Sowalabs.Bison.Pricing.Dependencies;
 using Sowalabs.Bison.Pricing.Strategies;
 
 namespace Sowalabs.Bison.Pricing
 {
-    public class PricingEngine
+    public class PricingEngine : IPricingService
     {
 
         private readonly Dictionary<Guid, Offer> _offers = new Dictionary<Guid, Offer>();
@@ -72,6 +73,14 @@ namespace Sowalabs.Bison.Pricing
         }
 
         public void RejectOffer(Guid offerId)
+        {
+            lock (this._offers)
+            {
+                this._offers.Remove(offerId);
+            }
+        }
+
+        public void MarkOfferExecuted(Guid offerId)
         {
             lock (this._offers)
             {
