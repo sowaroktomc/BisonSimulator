@@ -6,9 +6,9 @@ namespace Sowalabs.Bison.ProfitSim.Events
 {
     internal class NewPriceRequestEvent : ISimEvent
     {
-
         private readonly PricingEngine _pricingEngine;
-        private readonly decimal _volume;
+        private readonly decimal? _amount;
+        private readonly decimal? _value;
         private readonly BuySell _buySell;
 
         public Guid Id { get; }
@@ -16,24 +16,25 @@ namespace Sowalabs.Bison.ProfitSim.Events
 
         public Offer Offer { get; private set; }
 
-        public NewPriceRequestEvent(PricingEngine pricingEngine, DateTime requestAtTime, decimal requestVolume, BuySell buySell)
+        public NewPriceRequestEvent(PricingEngine pricingEngine, DateTime requestAtTime, decimal? requestAmount, decimal? requestValue, BuySell buySell)
         {
-            this.Id = Guid.NewGuid();
-            this._pricingEngine = pricingEngine;
-            this._volume = requestVolume;
-            this._buySell = buySell;
-            this.SimTime = requestAtTime;
+            Id = Guid.NewGuid();
+            _pricingEngine = pricingEngine;
+            _amount = requestAmount;
+            _value = requestValue;
+            _buySell = buySell;
+            SimTime = requestAtTime;
         }
 
         public void Simulate()
         {
-            switch (this._buySell)
+            switch (_buySell)
             {
                 case BuySell.Buy:
-                    this.Offer = this._pricingEngine.GetBuyOffer(this._volume);
+                    Offer = _pricingEngine.GetBuyOffer(_amount, _value);
                     break;
                 case BuySell.Sell:
-                    this.Offer = this._pricingEngine.GetSellOffer(this._volume);
+                    Offer = _pricingEngine.GetSellOffer(_amount, _value);
                     break;
             }
         }

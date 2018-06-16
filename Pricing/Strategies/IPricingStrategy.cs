@@ -2,7 +2,7 @@
 {
     public interface IPricingStrategy
     {
-        decimal GetBuyPrice(decimal volume);
-        decimal GetSellPrice(decimal volume);
+        decimal GetBuyPrice(decimal? amount, decimal? value);
+        decimal GetSellPrice(decimal? amount, decimal? value);
     }
 }

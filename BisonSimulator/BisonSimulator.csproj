@@ -50,11 +50,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomerGenerator.cs" />
+    <Compile Include="Dependencies\OrderBookHistoryLoaderFactory.cs" />
     <Compile Include="Dependencies\SimulatedBankApi.cs" />
     <Compile Include="Dependencies\SimTimer.cs" />
     <Compile Include="Dependencies\SimulatedTimerFactory.cs" />
     <Compile Include="Dependencies\SimulationDependencyFactory.cs" />
     <Compile Include="Events\ISimEvent.cs" />
+    <Compile Include="Events\MarketTradeEvent.cs" />
     <Compile Include="Events\NewPriceRequestEvent.cs" />
     <Compile Include="Events\OrderBookEvent.cs" />
     <Compile Include="Events\OfferAcceptedEvent.cs" />
@@ -69,6 +72,7 @@
     <Compile Include="IO\HistoryQueue.cs" />
     <Compile Include="IO\IHistoryEnumerator.cs" />
     <Compile Include="MarketAnalyzer.cs" />
+    <Compile Include="MarketAnalyzerFactory.cs" />
     <Compile Include="Model\MarketExtreme.cs" />
     <Compile Include="Model\MarketTrend.cs" />
     <Compile Include="Model\MarketVolatility.cs" />
@@ -78,15 +82,21 @@
     <Compile Include="ProfitResultForm.Designer.cs">
       <DependentUpon>ProfitResultForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MultiProfitSimForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MultiProfitSimForm.Designer.cs">
+      <DependentUpon>MultiProfitSimForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ProfitSimForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ProfitSimForm.Designer.cs">
       <DependentUpon>ProfitSimForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Model\SimulationCase.cs" />
     <Compile Include="Model\ProfitSimulationResult.cs" />
-    <Compile Include="Model\User.cs" />
+    <Compile Include="Model\Customer.cs" />
+    <Compile Include="ProfitSimulationConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProfitSimulator.cs" />
@@ -97,6 +107,9 @@
     <Compile Include="SimulationPropertySetter.cs" />
     <EmbeddedResource Include="ProfitResultForm.resx">
       <DependentUpon>ProfitResultForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MultiProfitSimForm.resx">
+      <DependentUpon>MultiProfitSimForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProfitSimForm.resx">
       <DependentUpon>ProfitSimForm.cs</DependentUpon>
@@ -112,6 +125,8 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\CustomerGenerator.Config.datasource" />
+    <None Include="Properties\DataSources\ProfitSimulationConfig.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -143,8 +158,6 @@
       <Name>Princing</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\DataSources\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

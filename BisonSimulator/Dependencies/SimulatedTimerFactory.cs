@@ -2,11 +2,18 @@
 
 namespace Sowalabs.Bison.ProfitSim.Dependencies
 {
-    public class SimulatedTimerFactory : ITimerFactory
+    internal class SimulatedTimerFactory : ITimerFactory
     {
+        private readonly SimulationEngine _engine;
+
+        public SimulatedTimerFactory(SimulationEngine engine)
+        {
+            _engine = engine;
+        }
+
         public ITimer CreateTimer()
         {
-            return new SimTimer();
+            return new SimTimer(_engine);
         }
     }
 }

@@ -6,15 +6,8 @@ namespace Sowalabs.Bison.ProfitSim
 {
     internal class SimulationEngine
     {
-        #region Singleton
-
-        private static readonly Lazy<SimulationEngine> Lazy = new Lazy<SimulationEngine>(() => new SimulationEngine());
-
-        public static SimulationEngine Instance => Lazy.Value;
-
-        #endregion
         
-        public readonly SimEventQueue _queue = new SimEventQueue();
+        private readonly SimEventQueue _queue = new SimEventQueue();
 
         public DateTime CurrentTime { get; private set; }
 

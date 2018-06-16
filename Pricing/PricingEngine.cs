@@ -21,7 +21,7 @@ namespace Sowalabs.Bison.Pricing
             {
                 lock (this._offers)
                 {
-                    return this._offers.Values.Cast<Bison.Common.Trading.Offer>().ToArray();
+                    return this._offers.Values.Cast<Common.Trading.Offer>().ToArray();
                 }
             }
         }
@@ -34,31 +34,32 @@ namespace Sowalabs.Bison.Pricing
 
         public PricingEngine(IDependencyFactory dependencyFactory)
         {
-            this._dependencyFactory = dependencyFactory;
-            this.PricingStrategy = new SimpleSpreadStrategy(this);
+            _dependencyFactory = dependencyFactory;
+            PricingStrategy = new SimpleSpreadStrategy(this);
         }
 
-        public Bison.Common.Trading.Offer GetBuyOffer(decimal volume)
+        public Common.Trading.Offer GetBuyOffer(decimal? amount, decimal? value)
         {
-            return this.CreateOffer(volume, Bison.Common.Trading.BuySell.Buy, () => this.PricingStrategy.GetBuyPrice(volume));
+            return CreateOffer(amount, value, Common.Trading.BuySell.Buy, () => this.PricingStrategy.GetBuyPrice(amount, value));
         }
-        public Bison.Common.Trading.Offer GetSellOffer(decimal volume)
+        public Common.Trading.Offer GetSellOffer(decimal? amount, decimal? value)
         {
-            return this.CreateOffer(volume, Bison.Common.Trading.BuySell.Sell, () => this.PricingStrategy.GetSellPrice(volume));
+            return CreateOffer(amount, value, Common.Trading.BuySell.Sell, () => this.PricingStrategy.GetSellPrice(amount, value));
         }
 
-        private Offer CreateOffer(decimal volume, Bison.Common.Trading.BuySell buySell, Func<decimal> priceGetter)
+        private Offer CreateOffer(decimal? volume, decimal? value, Common.Trading.BuySell buySell, Func<decimal> priceGetter)
         {
-            lock (this._offers)
+            lock (_offers)
             {
+                var price = priceGetter();
                 var offer = new Offer
                 {
-                    Amount = volume,
+                    Amount = volume ?? (value ?? 0) / price,
                     Price = priceGetter(),
                     BuySell = buySell
                 };
 
-                this._offers.Add(offer.Id, offer);
+                _offers.Add(offer.Id, offer);
 
                 return offer;
             }
@@ -66,25 +67,25 @@ namespace Sowalabs.Bison.Pricing
 
         public void AcceptOffer(Guid offerId)
         {
-            lock (this._offers)
+            lock (_offers)
             {
-                this._offers[offerId].Accepted = true;
+                _offers[offerId].Accepted = true;
             }
         }
 
         public void RejectOffer(Guid offerId)
         {
-            lock (this._offers)
+            lock (_offers)
             {
-                this._offers.Remove(offerId);
+                _offers.Remove(offerId);
             }
         }
 
         public void MarkOfferExecuted(Guid offerId)
         {
-            lock (this._offers)
+            lock (_offers)
             {
-                this._offers.Remove(offerId);
+                _offers.Remove(offerId);
             }
         }
 

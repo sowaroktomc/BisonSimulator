@@ -13,7 +13,7 @@ namespace Sowalabs.Bison.ProfitSim
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ProfitSimForm());
+            Application.Run(new MultiProfitSimForm());
         }
     }
 }

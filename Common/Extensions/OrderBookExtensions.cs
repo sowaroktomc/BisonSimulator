@@ -23,6 +23,23 @@ namespace Sowalabs.Bison.Common.Extensions
 
             return value;
         }
+        public static decimal GetTopEntriesAmount(this ICollection<OrderBookEntry> orderBookEntries, decimal value)
+        {
+            decimal amount = 0;
+            foreach (var entry in orderBookEntries)
+            {
+                var entryValue = Math.Min(value, entry.Amount * entry.Price);
+                amount += entryValue / entry.Price;
+                value -= entryValue;
+
+                if (value <= 0)
+                {
+                    break;
+                }
+            }
+
+            return amount;
+        }
 
     }
 }

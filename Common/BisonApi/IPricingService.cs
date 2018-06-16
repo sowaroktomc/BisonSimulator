@@ -5,8 +5,8 @@ namespace Sowalabs.Bison.Common.BisonApi
 {
     public interface IPricingService
     {
-        Offer GetBuyOffer(decimal volume);
-        Offer GetSellOffer(decimal volume);
+        Offer GetBuyOffer(decimal? amount, decimal? value);
+        Offer GetSellOffer(decimal? amount, decimal? value);
         void AcceptOffer(Guid offerId);
         void RejectOffer(Guid offerId);
         void MarkOfferExecuted(Guid offerId);

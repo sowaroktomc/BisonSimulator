@@ -1,0 +1,166 @@
+[
+{"OutputFilename":"Risk2Scenario1_Buy", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6}
+]},
+{"OutputFilename":"Risk2Scenario1_Sell", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6}
+]},
+{"OutputFilename":"Risk2Scenario2_Buy", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Buy","Value":50000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6, "IsMarketTrader":true}
+]},
+{"OutputFilename":"Risk2Scenario2_Sell", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
+{"BuySell":"Sell","Value":50000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6, "IsMarketTrader":true},
+]},
+{"OutputFilename":"Risk3-6_T1_Buy100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1}
+]},
+{"OutputFilename":"Risk3-6_T6_Buy100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6}
+]},
+{"OutputFilename":"Risk3-6_T11_Buy100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":11}
+]},
+{"OutputFilename":"Risk3-6_T60_Buy100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":60}
+]},
+{"OutputFilename":"Risk3-6_T300_Buy100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":300}
+]},
+{"OutputFilename":"Risk3-6_T900_Buy100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":900}
+]},
+{"OutputFilename":"Risk3-6_T1800_Buy100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1800}
+]},
+
+{"OutputFilename":"Risk3-6_T1_Buy1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1}
+]},
+{"OutputFilename":"Risk3-6_T6_Buy1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6}
+]},
+{"OutputFilename":"Risk3-6_T11_Buy1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":11}
+]},
+{"OutputFilename":"Risk3-6_T60_Buy1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":60}
+]},
+{"OutputFilename":"Risk3-6_T300_Buy1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":300}
+]},
+{"OutputFilename":"Risk3-6_T900_Buy1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":900}
+]},
+{"OutputFilename":"Risk3-6_T1800_Buy1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1800}
+]},
+
+{"OutputFilename":"Risk3-6_T1_Buy10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1}
+]},
+{"OutputFilename":"Risk3-6_T6_Buy10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6}
+]},
+{"OutputFilename":"Risk3-6_T11_Buy10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":11}
+]},
+{"OutputFilename":"Risk3-6_T60_Buy10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":60}
+]},
+{"OutputFilename":"Risk3-6_T300_Buy10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":300}
+]},
+{"OutputFilename":"Risk3-6_T900_Buy10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":900}
+]},
+{"OutputFilename":"Risk3-6_T1800_Buy10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Buy","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1800}
+]},
+
+
+{"OutputFilename":"Risk3-6_T1_Sell100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1}
+]},
+{"OutputFilename":"Risk3-6_T6_Sell100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6}
+]},
+{"OutputFilename":"Risk3-6_T11_Sell100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":11}
+]},
+{"OutputFilename":"Risk3-6_T60_Sell100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":60}
+]},
+{"OutputFilename":"Risk3-6_T300_Sell100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":300}
+]},
+{"OutputFilename":"Risk3-6_T900_Sell100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":900}
+]},
+{"OutputFilename":"Risk3-6_T1800_Sell100", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":100,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1800}
+]},
+
+{"OutputFilename":"Risk3-6_T1_Sell1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1}
+]},
+{"OutputFilename":"Risk3-6_T6_Sell1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6}
+]},
+{"OutputFilename":"Risk3-6_T11_Sell1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":11}
+]},
+{"OutputFilename":"Risk3-6_T60_Sell1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":60}
+]},
+{"OutputFilename":"Risk3-6_T300_Sell1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":300}
+]},
+{"OutputFilename":"Risk3-6_T900_Sell1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":900}
+]},
+{"OutputFilename":"Risk3-6_T1800_Sell1000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":1000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1800}
+]},
+
+{"OutputFilename":"Risk3-6_T1_Sell10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1}
+]},
+{"OutputFilename":"Risk3-6_T6_Sell10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6}
+]},
+{"OutputFilename":"Risk3-6_T11_Sell10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":11}
+]},
+{"OutputFilename":"Risk3-6_T60_Sell10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":60}
+]},
+{"OutputFilename":"Risk3-6_T300_Sell10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":300}
+]},
+{"OutputFilename":"Risk3-6_T900_Sell10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":900}
+]},
+{"OutputFilename":"Risk3-6_T1800_Sell10000", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
+{"BuySell":"Sell","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1800}
+]},
+]

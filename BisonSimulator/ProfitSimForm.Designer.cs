@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.simulateButton = new System.Windows.Forms.Button();
             this.numUsers = new System.Windows.Forms.TextBox();
+            this.simConfigSource = new System.Windows.Forms.BindingSource(this.components);
             this.reservationPeriod = new System.Windows.Forms.TextBox();
             this.hedgingDelay = new System.Windows.Forms.TextBox();
             this.offerAcceptanceRate = new System.Windows.Forms.TextBox();
@@ -49,9 +50,10 @@
             this.buySpread = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.sellSpread = new System.Windows.Forms.TextBox();
-            this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.customerConfigSource = new System.Windows.Forms.BindingSource(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.simConfigSource)).BeginInit();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.customerConfigSource)).BeginInit();
             this.SuspendLayout();
             // 
             // simulateButton
@@ -67,16 +69,20 @@
             // 
             // numUsers
             // 
-            this.numUsers.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "NumUsers", true));
+            this.numUsers.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.customerConfigSource, "NumCustomers", true));
             this.numUsers.Location = new System.Drawing.Point(408, 188);
             this.numUsers.Margin = new System.Windows.Forms.Padding(2);
             this.numUsers.Name = "numUsers";
             this.numUsers.Size = new System.Drawing.Size(52, 20);
             this.numUsers.TabIndex = 1;
             // 
+            // simConfigSource
+            // 
+            this.simConfigSource.DataSource = typeof(Sowalabs.Bison.ProfitSim.ProfitSimulationConfig);
+            // 
             // reservationPeriod
             // 
-            this.reservationPeriod.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "ReservationPeriod", true));
+            this.reservationPeriod.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.customerConfigSource, "ReservationPeriod", true));
             this.reservationPeriod.Location = new System.Drawing.Point(408, 328);
             this.reservationPeriod.Margin = new System.Windows.Forms.Padding(2);
             this.reservationPeriod.Name = "reservationPeriod";
@@ -85,7 +91,7 @@
             // 
             // hedgingDelay
             // 
-            this.hedgingDelay.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "HedgingDelay", true));
+            this.hedgingDelay.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.simConfigSource, "HedgingDelay", true));
             this.hedgingDelay.Location = new System.Drawing.Point(408, 352);
             this.hedgingDelay.Margin = new System.Windows.Forms.Padding(2);
             this.hedgingDelay.Name = "hedgingDelay";
@@ -94,7 +100,7 @@
             // 
             // offerAcceptanceRate
             // 
-            this.offerAcceptanceRate.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "OfferAcceptanceRate", true));
+            this.offerAcceptanceRate.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.customerConfigSource, "OfferAcceptanceRate", true));
             this.offerAcceptanceRate.Location = new System.Drawing.Point(408, 236);
             this.offerAcceptanceRate.Margin = new System.Windows.Forms.Padding(2);
             this.offerAcceptanceRate.Name = "offerAcceptanceRate";
@@ -206,7 +212,7 @@
             // 
             // simulatedTime
             // 
-            this.simulatedTime.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "SimulatedTime", true));
+            this.simulatedTime.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.customerConfigSource, "SimulatedTime", true));
             this.simulatedTime.Location = new System.Drawing.Point(408, 212);
             this.simulatedTime.Margin = new System.Windows.Forms.Padding(2);
             this.simulatedTime.Name = "simulatedTime";
@@ -225,7 +231,7 @@
             // 
             // buySpread
             // 
-            this.buySpread.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "BuySpread", true));
+            this.buySpread.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.simConfigSource, "BuySpread", true));
             this.buySpread.Location = new System.Drawing.Point(408, 391);
             this.buySpread.Margin = new System.Windows.Forms.Padding(2);
             this.buySpread.Name = "buySpread";
@@ -244,16 +250,16 @@
             // 
             // sellSpread
             // 
-            this.sellSpread.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "SellSpread", true));
+            this.sellSpread.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.simConfigSource, "SellSpread", true));
             this.sellSpread.Location = new System.Drawing.Point(408, 415);
             this.sellSpread.Margin = new System.Windows.Forms.Padding(2);
             this.sellSpread.Name = "sellSpread";
             this.sellSpread.Size = new System.Drawing.Size(52, 20);
             this.sellSpread.TabIndex = 18;
             // 
-            // bindingSource
+            // customerConfigSource
             // 
-            this.bindingSource.DataSource = typeof(Sowalabs.Bison.ProfitSim.ProfitSimulator);
+            this.customerConfigSource.DataSource = typeof(Sowalabs.Bison.ProfitSim.CustomerGenerator.Config);
             // 
             // ProfitSimForm
             // 
@@ -281,9 +287,10 @@
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ProfitSimForm";
             this.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.simConfigSource)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.customerConfigSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -292,7 +299,7 @@
         #endregion
 
         private System.Windows.Forms.Button simulateButton;
-        private System.Windows.Forms.BindingSource bindingSource;
+        private System.Windows.Forms.BindingSource simConfigSource;
         private System.Windows.Forms.TextBox numUsers;
         private System.Windows.Forms.TextBox reservationPeriod;
         private System.Windows.Forms.TextBox hedgingDelay;
@@ -312,6 +319,7 @@
         private System.Windows.Forms.TextBox buySpread;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox sellSpread;
+        private System.Windows.Forms.BindingSource customerConfigSource;
     }
 }
 

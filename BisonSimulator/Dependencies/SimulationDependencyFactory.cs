@@ -15,32 +15,32 @@ namespace Sowalabs.Bison.ProfitSim.Dependencies
 
         Pricing.Dependencies.IMarketApi Pricing.Dependencies.IDependencyFactory.GetMarketApi()
         {
-            return this.BitcoinMarketApi;
+            return BitcoinMarketApi;
         }
 
-        public SimulationDependencyFactory()
+        public SimulationDependencyFactory(SimulationEngine engine)
         {
-            this.BitcoinMarketApi = new SimulatedMarketApi();
-            this.TimerFactory = new SimulatedTimerFactory();
-            this.PricingEngine = new Pricing.PricingEngine(this);
-            this.HedgingEngine = new Hedger.HedgingEngine(this);
-            this.LiquidityEngine = new LiquidityEngine.LiquidityEngine(this);
+            BitcoinMarketApi = new SimulatedMarketApi {SubstractAmountsFromBooks = true};
+            TimerFactory = new SimulatedTimerFactory(engine);
+            PricingEngine = new Pricing.PricingEngine(this);
+            HedgingEngine = new Hedger.HedgingEngine(this);
+            LiquidityEngine = new LiquidityEngine.LiquidityEngine(this);
 
-            this.SolarisBank = new SimulatedBankApi();
+            SolarisBank = new SimulatedBankApi();
         }
 
         public Hedger.Dependencies.IMarketApi GetMarketApi()
         {
-            return this.BitcoinMarketApi;
+            return BitcoinMarketApi;
         }
 
         public LiquidityEngine.Dependencies.IBankApi GetBankApi(string bankSwiftCode)
         {
-            return this.SolarisBank;
+            return SolarisBank;
         }
 
 
-        Common.Timer.ITimerFactory Hedger.Dependencies.IDependencyFactory.TimerFactory => this.TimerFactory;
+        Common.Timer.ITimerFactory Hedger.Dependencies.IDependencyFactory.TimerFactory => TimerFactory;
 
 
     }

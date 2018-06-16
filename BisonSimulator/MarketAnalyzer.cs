@@ -1,9 +1,9 @@
 ﻿using Sowalabs.Bison.Common.Trading;
+using Sowalabs.Bison.ProfitSim.IO;
 using Sowalabs.Bison.ProfitSim.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sowalabs.Bison.ProfitSim.IO;
 using Sowalabs.Bison.ProfitSim.IO.Bitstamp;
 
 namespace Sowalabs.Bison.ProfitSim
@@ -12,39 +12,61 @@ namespace Sowalabs.Bison.ProfitSim
     {
         private struct Entry
         {
-            public Entry(DateTime time, decimal askPrice, decimal bidPrice)
+            public Entry(DateTime time, decimal? askPrice, decimal? bidPrice)
             {
                 Time = time;
                 AskPrice = askPrice;
                 BidPrice = bidPrice;
             }
             public DateTime Time { get; }
-            public decimal AskPrice { get; }
-            public decimal BidPrice { get; }
-            public decimal Price => (AskPrice + BidPrice) / 2;
+            public decimal? AskPrice { get; }
+            public decimal? BidPrice { get; }
         }
 
-        public MarketVolatility Volatility
+        public class Statistic
         {
-            get
+            private readonly List<decimal> _prices;
+            public Statistic(IEnumerable<decimal?> prices)
             {
-                if (_priceHistory.Count <= 1)
+                _prices = prices.Where(price => price.HasValue).Cast<decimal>().ToList();
+            }
+
+
+            public Lazy<MarketVolatility> Volatility => new Lazy<MarketVolatility>(() =>
                 {
-                    return MarketVolatility.Nonvolatile;
+                    if (_prices.Count <= 1)
+                    {
+                        return MarketVolatility.Nonvolatile;
+                    }
+
+
+                    return VolatilityValue.Value > 0.01m ? MarketVolatility.Volatile : MarketVolatility.Nonvolatile;
+                }
+            );
+
+            public Lazy<decimal> VolatilityValue => new Lazy<decimal>(() =>
+            {
+                if (_prices.Count <= 1)
+                {
+                    return 0;
                 }
 
-                var mean = _priceHistory.Average(entry => entry.Price);
-                var variance = _priceHistory.Select(entry => (entry.Price - mean) * (entry.Price - mean)).Sum() / (_priceHistory.Count - 1);
+                var mean = _prices.Average();
+                var variance = _prices.Select(price => (price - mean) * (price - mean)).Sum() / (_prices.Count - 1);
                 var standardDeviation = Convert.ToDecimal(Math.Sqrt(Convert.ToDouble(variance)));
 
-                return standardDeviation / mean > 0.05m ? MarketVolatility.Volatile : MarketVolatility.Nonvolatile;
-            }
-        }
-        public MarketTrend Trend
-        {
-            get
+                return standardDeviation / mean;
+
+            });
+
+            public Lazy<decimal> OpenPrice => new Lazy<decimal>(() => _prices.Count > 0 ? _prices[0] : 0);
+            public Lazy<decimal> ClosePrice => new Lazy<decimal>(() => _prices.Count > 0 ? _prices[_prices.Count - 1] : 0);
+            public Lazy<decimal> HighPrice => new Lazy<decimal>(() => _prices.Count > 0 ? _prices.Max() : 0);
+            public Lazy<decimal> LowPrice => new Lazy<decimal>(() => _prices.Count > 0 ? _prices.Min() : 0);
+
+            public Lazy<MarketTrend> Trend => new Lazy<MarketTrend>(() =>
             {
-                var priceDiff = _priceHistory[_priceHistory.Count - 1].Price - _priceHistory[0].Price;
+                var priceDiff = _prices[_prices.Count - 1] - _prices[0];
                 if (priceDiff < 0)
                 {
                     return MarketTrend.Down;
@@ -56,37 +78,46 @@ namespace Sowalabs.Bison.ProfitSim
                 }
 
                 return MarketTrend.Up;
-            }
-        }
-        public MarketExtreme Extreme
-        {
-            get
+            });
+
+            public Lazy<MarketExtreme> Extreme => new Lazy<MarketExtreme>(() =>
             {
-                var priceDiff = (_priceHistory[_priceHistory.Count - 1].Price - _priceHistory[0].Price) / _priceHistory[0].Price;
+                var priceDiff = (_prices[_prices.Count - 1] - _prices[0]) / _prices[0];
                 if (priceDiff <= -0.02m)
                 {
                     return MarketExtreme.HighFall;
                 }
+
                 if (priceDiff >= 0.02m)
                 {
                     return MarketExtreme.HighRise;
                 }
 
                 return MarketExtreme.None;
-            }
+            });
         }
 
 
-        private readonly List<Entry> _priceHistory;
-        private readonly HistoryQueue _history;
+        private List<Entry> _priceHistory;
+        private HistoryQueue _history;
+        private readonly BitstampHistoryLoader _historyLoader;
 
         public TimeSpan MaxTimespan { get; }
+        public Statistic BidStat { get; private set; }
+        public Statistic AskStat { get; private set; }
 
-        public MarketAnalyzer(HistoryQueue historyQueue)
+        public MarketAnalyzer(BitstampHistoryLoader historyLoader)
+        {
+            MaxTimespan = TimeSpan.FromSeconds(20);
+
+            _historyLoader = historyLoader;
+        }
+
+        public void Init()
         {
             _priceHistory = new List<Entry>();
-            _history = historyQueue;
-            MaxTimespan = TimeSpan.FromHours(1);
+            _history = new HistoryQueue(_historyLoader);
+
             var halfMaxTimespan = new TimeSpan(MaxTimespan.Ticks / 2);
 
             var first = _history.GetNext();
@@ -95,6 +126,8 @@ namespace Sowalabs.Bison.ProfitSim
             {
                 AppendOrderBook(next);
             }
+
+            CreateStatistics();
         }
 
         public void Next()
@@ -111,19 +144,26 @@ namespace Sowalabs.Bison.ProfitSim
             }
             else
             {
-                _priceHistory.RemoveAt(0);
+                if (_priceHistory.Count > 0)
+                {
+                    _priceHistory.RemoveAt(0);
+                }
             }
+
+            CreateStatistics();
+        }
+
+        private void CreateStatistics()
+        {
+            BidStat = new Statistic(_priceHistory.Select(entry => entry.BidPrice));
+            AskStat = new Statistic(_priceHistory.Select(entry => entry.AskPrice));
         }
 
         private void AppendOrderBook(OrderBook book)
         {
-            if (_priceHistory.Count == 0 && (book.Asks.Count == 0 || book.Bids.Count == 0))
-            {
-                return;
-            }
-
-            var askPrice = book.Asks.Count > 0 ? book.Asks[0].Price : _priceHistory[_priceHistory.Count - 1].AskPrice;
-            var bidPrice = book.Bids.Count > 0 ? book.Bids[0].Price : _priceHistory[_priceHistory.Count - 1].BidPrice;
+            var lastEntry = _priceHistory.Count > 0 ? _priceHistory[_priceHistory.Count - 1] : (Entry?) null;
+            var askPrice = book.Asks.Count > 0 ? book.Asks[0].Price : lastEntry?.AskPrice;
+            var bidPrice = book.Bids.Count > 0 ? book.Bids[0].Price : lastEntry?.BidPrice;
 
             _priceHistory.Add(new Entry(book.AcqTime, askPrice, bidPrice));
         }

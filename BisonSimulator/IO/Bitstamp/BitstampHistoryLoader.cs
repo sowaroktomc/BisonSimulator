@@ -4,47 +4,41 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using Newtonsoft.Json;
+using Sowalabs.Bison.Common.Environment;
 using Sowalabs.Bison.ProfitSim.IO.Bitstamp.Model;
 
 namespace Sowalabs.Bison.ProfitSim.IO.Bitstamp
 {
     internal class BitstampHistoryLoader
     {
-        private readonly Queue<string> _addressQueue = new Queue<string>();
         private readonly List<IHistoryEnumerator> _enumerators = new List<IHistoryEnumerator>();
-        private bool _firstDataLoaded;
 
-        public BitstampHistoryLoader()
+        private readonly DateTime _fromDate;
+        private readonly DateTime _toDate;
+        private DateTime _currentDate;
+        public Crypto Crypto { get; }
+
+        public BitstampHistoryLoader(Crypto crypto)
         {
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_00");
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_01");
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_02");
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_03");
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_04");
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_05");
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_06");
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_07");
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_08");
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_09");
-            _addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_10");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_11");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_12");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_13");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_14");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_15");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_16");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_17");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_18");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_19");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_20");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_21");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_22");
-            //_addressQueue.Enqueue("http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_btceur_2018/orders_2018_06_06_23");
+            Crypto = crypto;
+            _fromDate = new DateTime(2018, 6, 6, 9, 0, 0);
+            _toDate = new DateTime(2018, 6, 6, 10, 0, 0);
+            _currentDate = _fromDate;
+        }
+
+        public void Restart()
+        {
+            _currentDate = _fromDate;
+        }
+
+        private string GetAddress()
+        {
+            return $"http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_{Crypto}eur_{_currentDate.Year:D4}/orders_{_currentDate.Year:D4}_{_currentDate.Month:D2}_{_currentDate.Day:D2}_{_currentDate.Hour:D2}";
         }
 
         public bool LoadData()
         {
-            if (_addressQueue.Count == 0)
+            if (_currentDate > _toDate)
             {
                 return false;
             }
@@ -53,7 +47,7 @@ namespace Sowalabs.Bison.ProfitSim.IO.Bitstamp
             
             using (var webClient = new WebClient())
             {
-                var address = _addressQueue.Dequeue();
+                var address = GetAddress();
                 System.Diagnostics.Debug.Write("Loading data from " + address);
 
                 using (var reader = new JsonTextReader(new StreamReader(webClient.OpenRead(address))))
@@ -70,13 +64,13 @@ namespace Sowalabs.Bison.ProfitSim.IO.Bitstamp
             }
 
             _enumerators.ForEach(enumerator => enumerator.AppendHistory(orderBookHistory));
-            _firstDataLoaded = true;
+            _currentDate = _currentDate.AddHours(1);
             return true;
         }
 
         public void RegisterEnumerator(IHistoryEnumerator enumerator)
         {
-            if (_firstDataLoaded)
+            if (_currentDate > _fromDate)
             {
                 throw new Exception("Adding data enumerator after data has been loaded.");
             }
