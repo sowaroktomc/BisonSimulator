@@ -26,25 +26,32 @@ namespace Sowalabs.Bison.ProfitSim
         public class Statistic
         {
             private readonly List<decimal> _prices;
+            private readonly Lazy<decimal> _lazyOpenPrice;
+            private readonly Lazy<decimal> _lazyHighPrice;
+            private readonly Lazy<decimal> _lazyLowPrice;
+            private readonly Lazy<decimal> _lazyClosePrice;
+            private readonly Lazy<decimal> _lazyVolatility;
+
+
             public Statistic(IEnumerable<decimal?> prices)
             {
                 _prices = prices.Where(price => price.HasValue).Cast<decimal>().ToList();
+                _lazyOpenPrice = new Lazy<decimal>(() => _prices.Count > 0 ? _prices[0] : 0);
+                _lazyHighPrice = new Lazy<decimal>(() => _prices.Count > 0 ? _prices.Max() : 0);
+                _lazyLowPrice = new Lazy<decimal>(() => _prices.Count > 0 ? _prices.Min() : 0);
+                _lazyClosePrice = new Lazy<decimal>(() => _prices.Count > 0 ? _prices[_prices.Count - 1] : 0);
+                _lazyVolatility = new Lazy<decimal>(CalcVolatility);
             }
 
+            public decimal VolatilityValue => _lazyVolatility.Value;
+            public decimal OpenPrice => _lazyOpenPrice.Value;
 
-            public Lazy<MarketVolatility> Volatility => new Lazy<MarketVolatility>(() =>
-                {
-                    if (_prices.Count <= 1)
-                    {
-                        return MarketVolatility.Nonvolatile;
-                    }
+            public decimal ClosePrice => _lazyClosePrice.Value;
+            public decimal HighPrice => _lazyHighPrice.Value;
+            public decimal LowPrice => _lazyLowPrice.Value;
 
 
-                    return VolatilityValue.Value > 0.01m ? MarketVolatility.Volatile : MarketVolatility.Nonvolatile;
-                }
-            );
-
-            public Lazy<decimal> VolatilityValue => new Lazy<decimal>(() =>
+            private decimal CalcVolatility()
             {
                 if (_prices.Count <= 1)
                 {
@@ -56,47 +63,8 @@ namespace Sowalabs.Bison.ProfitSim
                 var standardDeviation = Convert.ToDecimal(Math.Sqrt(Convert.ToDouble(variance)));
 
                 return standardDeviation / mean;
-
-            });
-
-            public Lazy<decimal> OpenPrice => new Lazy<decimal>(() => _prices.Count > 0 ? _prices[0] : 0);
-            public Lazy<decimal> ClosePrice => new Lazy<decimal>(() => _prices.Count > 0 ? _prices[_prices.Count - 1] : 0);
-            public Lazy<decimal> HighPrice => new Lazy<decimal>(() => _prices.Count > 0 ? _prices.Max() : 0);
-            public Lazy<decimal> LowPrice => new Lazy<decimal>(() => _prices.Count > 0 ? _prices.Min() : 0);
-
-            public Lazy<MarketTrend> Trend => new Lazy<MarketTrend>(() =>
-            {
-                var priceDiff = _prices[_prices.Count - 1] - _prices[0];
-                if (priceDiff < 0)
-                {
-                    return MarketTrend.Down;
-                }
-
-                if (priceDiff == 0)
-                {
-                    return MarketTrend.NoChange;
-                }
-
-                return MarketTrend.Up;
-            });
-
-            public Lazy<MarketExtreme> Extreme => new Lazy<MarketExtreme>(() =>
-            {
-                var priceDiff = (_prices[_prices.Count - 1] - _prices[0]) / _prices[0];
-                if (priceDiff <= -0.02m)
-                {
-                    return MarketExtreme.HighFall;
-                }
-
-                if (priceDiff >= 0.02m)
-                {
-                    return MarketExtreme.HighRise;
-                }
-
-                return MarketExtreme.None;
-            });
+            }
         }
-
 
         private List<Entry> _priceHistory;
         private HistoryQueue _history;

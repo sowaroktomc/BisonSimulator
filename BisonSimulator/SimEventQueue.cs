@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Sowalabs.Bison.ProfitSim.Events;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Sowalabs.Bison.ProfitSim.Events;
 
 namespace Sowalabs.Bison.ProfitSim
 {
@@ -9,14 +8,12 @@ namespace Sowalabs.Bison.ProfitSim
     {
         private class QueueEntry
         {
-            public DateTime TimeStamp { get; }
-            public DateTime SimTime { get; }
-            public int Priority { get; }
-            public ISimEvent Event { get; }
+            public DateTime SimTime;
+            public int Priority;
+            public ISimEvent Event;
 
             public QueueEntry(ISimEvent simEvent)
             {
-                TimeStamp = DateTime.Now;
                 Event = simEvent;
                 SimTime = simEvent.SimTime;
                 Priority = GetPriority(simEvent);
@@ -48,46 +45,63 @@ namespace Sowalabs.Bison.ProfitSim
             }
         }
         
-        private class QueueEntryComparer : IComparer<QueueEntry>
-        {
-            public int Compare(QueueEntry x, QueueEntry y)
-            {
-                Debug.Assert(x != null, nameof(x) + " != null");
-                Debug.Assert(y != null, nameof(y) + " != null");
-
-                if (x.Event == y.Event) return 0;
-                if (x.SimTime != y.SimTime) return x.SimTime.CompareTo(y.SimTime);
-                if (x.Priority != y.Priority) return x.Priority.CompareTo(y.Priority);
-                if (x.TimeStamp != y.TimeStamp) return x.TimeStamp.CompareTo(y.TimeStamp);
-                return x.Event.Id.CompareTo(y.Event.Id);
-            }
-        }
-
-        private readonly SortedSet<QueueEntry> _queue = new SortedSet<QueueEntry>(new QueueEntryComparer());
+        private List<QueueEntry> _queue = new List<QueueEntry>();
 
         public void Enqueue(ISimEvent simEvent)
         {
-            if (!_queue.Add(new QueueEntry(simEvent)))
+            var min = 0;
+            var max = _queue.Count;
+            var newEntry = new QueueEntry(simEvent);
+
+            while (min < max)
             {
-                throw new Exception("Duplicate event!?");
+                var mid = (max + min) / 2;
+                var midEntry = _queue[mid];
+
+                if (midEntry.Event == simEvent)
+                {
+                    return;
+                }
+                if (midEntry.SimTime < newEntry.SimTime)
+                {
+                    max = mid;
+                    continue;
+                }
+                if (midEntry.SimTime == newEntry.SimTime && midEntry.Priority <= newEntry.Priority)
+                {
+                    max = mid;
+                    continue;
+                }
+                min = mid + 1;
             }
+
+            _queue.Insert(max, newEntry);
         }
 
         public ISimEvent Dequeue()
         {
-            var entry = _queue.Min;
-            _queue.Remove(entry);
-            return entry?.Event;
+            var count = _queue.Count;
+            if (count == 0)
+            {
+                return null;
+            }
+            var entry = _queue[count - 1];
+            _queue.RemoveAt(count - 1);
+            return entry.Event;
         }
 
         public void Remove(ISimEvent simEvent)
         {
-            _queue.RemoveWhere(entry => entry.Event == simEvent);
+            _queue.RemoveAll(entry => entry.Event == simEvent);
         }
 
         public ISimEvent PeekLast()
         {
-            return _queue.Max?.Event;
+            if (_queue.Count == 0)
+            {
+                return null;
+            }
+            return _queue[0].Event;
         }
     }
 }

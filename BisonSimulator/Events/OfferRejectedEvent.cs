@@ -7,18 +7,17 @@ namespace Sowalabs.Bison.ProfitSim.Events
     {
         private readonly NewPriceRequestEvent _priceRequestEvent;
         private readonly SimulationDependencyFactory _dependencyFactory;
+        private DateTime _simTime;
+
+        public DateTime SimTime { get { return _simTime; } set { _simTime = value; } }
 
         public OfferRejectedEvent(SimulationDependencyFactory dependencyFactory, NewPriceRequestEvent priceRequestEvent, DateTime rejectAtTime)
         {
             this._priceRequestEvent = priceRequestEvent;
             this._dependencyFactory = dependencyFactory;
-            this.SimTime = rejectAtTime;
-            this.Id = Guid.NewGuid();
+            this._simTime = rejectAtTime;
         }
 
-
-        public Guid Id { get; }
-        public DateTime SimTime { get; }
         public void Simulate()
         {
             this._dependencyFactory.PricingEngine.RejectOffer(this._priceRequestEvent.Offer.Id);

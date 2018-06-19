@@ -22,6 +22,7 @@ namespace Sowalabs.Bison.ProfitSim.Model
             public decimal L { get; set; }
             public decimal C { get; set; }
             public decimal V { get; set; }
+            public decimal Price { get; set; }
 
             [JsonIgnore]
             public MarketVolatility Volatility { get; set; }

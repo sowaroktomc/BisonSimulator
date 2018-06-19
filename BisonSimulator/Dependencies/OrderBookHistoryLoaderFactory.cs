@@ -16,7 +16,7 @@ namespace Sowalabs.Bison.ProfitSim.Dependencies
 
         private OrderBookHistoryLoaderFactory()
         {
-            _loaders = Enum.GetValues(typeof(Crypto)).Cast<Crypto>().Select(crypto => new BitstampHistoryLoader(crypto)).ToDictionary(loader => loader.Crypto);
+            _loaders = Enum.GetValues(typeof(Crypto)).Cast<Crypto>().Select(crypto => new BitstampHistoryLoader(crypto, null, null)).ToDictionary(loader => loader.Crypto);
         }
 
         public BitstampHistoryLoader GetLoader(Crypto crypto)

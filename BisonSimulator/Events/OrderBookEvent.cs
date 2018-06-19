@@ -8,16 +8,16 @@ namespace Sowalabs.Bison.ProfitSim.Events
     {
         private readonly OrderBook _orderBook;
         private readonly SimulatedMarketApi _marketApi;
+        private DateTime _simTime;
+
+        public DateTime SimTime { get { return _simTime; } set { _simTime = value; } }
 
         public OrderBookEvent(OrderBook orderBook, SimulatedMarketApi marketApi)
         {
             this._orderBook = orderBook;
             this._marketApi = marketApi;
-            this.Id = Guid.NewGuid();
+            _simTime = orderBook.AcqTime;
         }
-
-        public Guid Id { get; }
-        public DateTime SimTime => this._orderBook.AcqTime;
 
         public void Simulate()
         {

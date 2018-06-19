@@ -6,6 +6,7 @@ using Sowalabs.Bison.ProfitSim.IO.Bitstamp;
 using Sowalabs.Bison.ProfitSim.Model;
 using System;
 using System.IO;
+using System.Threading;
 using Newtonsoft.Json;
 using Sowalabs.Bison.Common.Trading;
 
@@ -104,26 +105,23 @@ namespace Sowalabs.Bison.ProfitSim
             var marketStats = _config.Customers[0].BuySell == BuySell.Buy ? _marketAnalyzer.AskStat : _marketAnalyzer.BidStat;
             var profitEntry = new ProfitSimulationResult.PLEntry(firstOrderBook.AcqTime, profit)
             {
-                Volatility = marketStats.Volatility.Value,
-                Trend = marketStats.Trend.Value,
-                Extreme = marketStats.Extreme.Value,
-                O = marketStats.OpenPrice.Value,
-                H = marketStats.HighPrice.Value,
-                L = marketStats.LowPrice.Value,
-                C = marketStats.ClosePrice.Value,
-                V = marketStats.VolatilityValue.Value
+                //Volatility = marketStats.Volatility.Value,
+                //Trend = marketStats.Trend.Value,
+                //Extreme = marketStats.Extreme.Value,
+                O = marketStats.OpenPrice,
+                H = marketStats.HighPrice,
+                L = marketStats.LowPrice,
+                C = marketStats.ClosePrice,
+                V = marketStats.VolatilityValue,
+                Price = _config.Customers[0].BuySell == BuySell.Buy ? firstOrderBook.Asks[0].Price : firstOrderBook.Bids[0].Price
             };
 
 
-            Result.Entries.Add(profitEntry);
+            //Result.Entries.Add(profitEntry);
             if (_outputFileWriter != null)
             {
-                if (Result.Entries.Count > 1)
-                {
-                    _outputFileWriter.Write(',');
-                }
-
                 _serializer.Serialize(_outputFileWriter, profitEntry);
+                _outputFileWriter.WriteLine(',');
             }
 
             _dependencyFactory.BitcoinMarketApi.Reset();

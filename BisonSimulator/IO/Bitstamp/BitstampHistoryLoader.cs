@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,19 +17,25 @@ namespace Sowalabs.Bison.ProfitSim.IO.Bitstamp
         private readonly DateTime _fromDate;
         private readonly DateTime _toDate;
         private DateTime _currentDate;
+        private static object _synchronizationContext = new object();
+        public object SynchronizationContext {  get { return _synchronizationContext; } }
+
         public Crypto Crypto { get; }
 
-        public BitstampHistoryLoader(Crypto crypto)
+        public BitstampHistoryLoader(Crypto crypto, DateTime? fromDateTime, DateTime? toDateTime)
         {
             Crypto = crypto;
-            _fromDate = new DateTime(2018, 6, 6, 9, 0, 0);
-            _toDate = new DateTime(2018, 6, 6, 10, 0, 0);
+            _fromDate = fromDateTime ?? new DateTime(2018, 4, 4, 0, 0, 0);
+            _toDate = toDateTime ?? new DateTime(2018, 5, 1, 0, 0, 0);
             _currentDate = _fromDate;
         }
 
         public void Restart()
         {
-            _currentDate = _fromDate;
+            lock (SynchronizationContext)
+            {
+                _currentDate = _fromDate;
+            }
         }
 
         private string GetAddress()
@@ -38,34 +45,37 @@ namespace Sowalabs.Bison.ProfitSim.IO.Bitstamp
 
         public bool LoadData()
         {
-            if (_currentDate > _toDate)
+            lock (SynchronizationContext)
             {
-                return false;
-            }
-
-            var orderBookHistory = new List<Common.Trading.OrderBook>();
-            
-            using (var webClient = new WebClient())
-            {
-                var address = GetAddress();
-                System.Diagnostics.Debug.Write("Loading data from " + address);
-
-                using (var reader = new JsonTextReader(new StreamReader(webClient.OpenRead(address))))
+                if (_currentDate > _toDate)
                 {
-                    reader.SupportMultipleContent = true;
-                    var serializer = new JsonSerializer();
-                    while (reader.Read())
-                    {
-                        reader.Read(); //Each JSON is prefixed with a timestamp value - skip it.
-                        orderBookHistory.Add(Convert(serializer.Deserialize<OrderBook>(reader)));
-                    }
+                    return false;
                 }
-                System.Diagnostics.Debug.WriteLine("   -   done.");
-            }
 
-            _enumerators.ForEach(enumerator => enumerator.AppendHistory(orderBookHistory));
-            _currentDate = _currentDate.AddHours(1);
-            return true;
+                var orderBookHistory = new List<Common.Trading.OrderBook>();
+
+                using (var webClient = new WebClient())
+                {
+                    var address = GetAddress();
+                    Trace.Write("Loading data from " + address);
+
+                    using (var reader = new JsonTextReader(new StreamReader(webClient.OpenRead(address))))
+                    {
+                        reader.SupportMultipleContent = true;
+                        var serializer = new JsonSerializer();
+                        while (reader.Read())
+                        {
+                            reader.Read(); //Each JSON is prefixed with a timestamp value - skip it.
+                            orderBookHistory.Add(Convert(serializer.Deserialize<OrderBook>(reader)));
+                        }
+                    }
+                    Trace.WriteLine("   -   done.");
+                }
+
+                _enumerators.ForEach(enumerator => enumerator.AppendHistory(orderBookHistory));
+                _currentDate = _currentDate.AddHours(1);
+                return true;
+            }
         }
 
         public void RegisterEnumerator(IHistoryEnumerator enumerator)

@@ -6,16 +6,16 @@ namespace Sowalabs.Bison.ProfitSim.Events
     {
 
         private readonly Action _action;
+        private DateTime _simTime;
+
+        public DateTime SimTime { get { return _simTime; } set { _simTime = value; } }
 
         public TimerEvent(DateTime actionTime, Action action)
         {
-            this.SimTime = actionTime;
+            this._simTime = actionTime;
             this._action = action;
-            this.Id = Guid.NewGuid();
         }
 
-        public Guid Id { get; }
-        public DateTime SimTime { get; }
         public void Simulate()
         {
             this._action();

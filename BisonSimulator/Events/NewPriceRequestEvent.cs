@@ -10,20 +10,19 @@ namespace Sowalabs.Bison.ProfitSim.Events
         private readonly decimal? _amount;
         private readonly decimal? _value;
         private readonly BuySell _buySell;
+        private DateTime _simTime;
 
-        public Guid Id { get; }
-        public DateTime SimTime { get; }
+        public DateTime SimTime { get { return _simTime; } set { _simTime = value; } }
 
         public Offer Offer { get; private set; }
 
         public NewPriceRequestEvent(PricingEngine pricingEngine, DateTime requestAtTime, decimal? requestAmount, decimal? requestValue, BuySell buySell)
         {
-            Id = Guid.NewGuid();
             _pricingEngine = pricingEngine;
             _amount = requestAmount;
             _value = requestValue;
             _buySell = buySell;
-            SimTime = requestAtTime;
+            _simTime = requestAtTime;
         }
 
         public void Simulate()
