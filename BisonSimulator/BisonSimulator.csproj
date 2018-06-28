@@ -56,8 +56,9 @@
     <Compile Include="CleanupForm.Designer.cs">
       <DependentUpon>CleanupForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CustomerGenerator.cs" />
-    <Compile Include="Dependencies\OrderBookHistoryLoaderFactory.cs" />
+    <Compile Include="Config\SimulationScenario.cs" />
+    <Compile Include="CustomerGenerating\CustomerGenerator.cs" />
+    <Compile Include="CustomerGenerating\CustomerGeneratorConfig.cs" />
     <Compile Include="Dependencies\SimulatedBankApi.cs" />
     <Compile Include="Dependencies\SimTimer.cs" />
     <Compile Include="Dependencies\SimulatedTimerFactory.cs" />
@@ -76,18 +77,10 @@
     <Compile Include="IO\Bitstamp\Model\OrderBook.cs" />
     <Compile Include="IO\HistoryEnumerator.cs" />
     <Compile Include="IO\HistoryQueue.cs" />
-    <Compile Include="IO\IHistoryEnumerator.cs" />
+    <Compile Include="IO\IHistoryProvider.cs" />
+    <Compile Include="IO\Output\CsvProfitSimulationWriter.cs" />
+    <Compile Include="IO\Output\IProfitSimulationWriter.cs" />
     <Compile Include="MarketAnalyzer.cs" />
-    <Compile Include="MarketAnalyzerFactory.cs" />
-    <Compile Include="Model\MarketExtreme.cs" />
-    <Compile Include="Model\MarketTrend.cs" />
-    <Compile Include="Model\MarketVolatility.cs" />
-    <Compile Include="ProfitResultForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ProfitResultForm.Designer.cs">
-      <DependentUpon>ProfitResultForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="MultiProfitSimForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -100,23 +93,21 @@
     <Compile Include="ProfitSimForm.Designer.cs">
       <DependentUpon>ProfitSimForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Model\ProfitSimulationResult.cs" />
-    <Compile Include="Model\Customer.cs" />
-    <Compile Include="ProfitSimulationConfig.cs" />
+    <Compile Include="Entity\ProfitSimulationResult.cs" />
+    <Compile Include="Entity\Customer.cs" />
+    <Compile Include="ProfitSimulation.cs" />
+    <Compile Include="Config\SimulationConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProfitSimulator.cs" />
     <Compile Include="Dependencies\SimulatedMarketApi.cs" />
     <Compile Include="SimEventQueue.cs" />
     <Compile Include="SimulationEngine.cs" />
-    <Compile Include="SimulationLiquidityEngineQueue.cs" />
-    <Compile Include="SimulationPropertySetter.cs" />
+    <Compile Include="SimulationMoqs\LiquidityEngineQueueMoq.cs" />
+    <Compile Include="TextBoxTraceListener.cs" />
     <Compile Include="ThreadedExecutor.cs" />
     <EmbeddedResource Include="CleanupForm.resx">
       <DependentUpon>CleanupForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProfitResultForm.resx">
-      <DependentUpon>ProfitResultForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MultiProfitSimForm.resx">
       <DependentUpon>MultiProfitSimForm.cs</DependentUpon>

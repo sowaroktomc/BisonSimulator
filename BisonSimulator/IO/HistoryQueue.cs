@@ -4,74 +4,72 @@ using System.Collections.Generic;
 
 namespace Sowalabs.Bison.ProfitSim.IO
 {
-    internal class HistoryQueue : IHistoryEnumerator
+    /// <summary>
+    /// Iterates over order book history series and loads new data when needed.
+    /// </summary>
+    internal class HistoryQueue : IHistoryProvider
     {
         private readonly BitstampHistoryLoader _loader;
-        private readonly List<OrderBook> _history = new List<OrderBook>();
-        private System.Threading.Mutex _locker = new System.Threading.Mutex();
-        private bool _isNewHistoryJustLoaded;
+        private readonly LinkedList<OrderBook> _history = new LinkedList<OrderBook>();
+        private readonly System.Threading.Mutex _locker = new System.Threading.Mutex();
+        private int? _lastPeriodSynchronizationToken;
 
         public HistoryQueue(BitstampHistoryLoader loader)
         {
             _loader = loader;
-            _loader.RegisterEnumerator(this);
+            _loader.RegisterHistoryProvider(this);
         }
 
-        public void AppendHistory(List<OrderBook> history)
+        /// <summary>
+        /// Append additional history to internal storage.
+        /// </summary>
+        /// <param name="history">List of history entries to append.</param>
+        /// <param name="periodSynchronizationToken">Token identifying time period from which historical data is from.</param>
+        public void AppendHistory(List<OrderBook> history, int periodSynchronizationToken)
         {
-            _locker.WaitOne();
-            try
+            lock (_locker)
             {
-                _history.AddRange(history);
-            }
-            finally
-            {
-                _locker.ReleaseMutex();
+                history.ForEach(entry => _history.AddLast(entry));
+                _lastPeriodSynchronizationToken = periodSynchronizationToken;
             }
         }
 
+        /// <summary>
+        /// Removes next order book entry from history and returns it.
+        /// </summary>
+        /// <returns>Next order book entry from history.</returns>
         public OrderBook GetNext()
         {
-            _locker.WaitOne();
-            try
+            int historyCount;
+            int? periodSynchronizationToken;
+            lock (_locker)
             {
-                if (_history.Count == 0)
-                {
-                    if (!LoadNewData())
-                    {
-                        return null;
-                    }
-                }
-
-                var next = _history[0];
-                _history.RemoveAt(0);
-                return next;
+                historyCount = _history.Count;
+                periodSynchronizationToken = _lastPeriodSynchronizationToken;
             }
-            finally
+
+            if (historyCount == 0)
             {
-                _locker.ReleaseMutex();
+                if (!_loader.LoadData(periodSynchronizationToken))
+                {
+                    return null;
+                }
+            }
+
+            lock (_locker)
+            {
+                var next = _history.First;
+                _history.RemoveFirst();
+                return next.Value;
             }
         }
 
-        private bool LoadNewData()
+        /// <summary>
+        /// Closes queue.
+        /// </summary>
+        public void Close()
         {
-            _isNewHistoryJustLoaded = false;
-            _locker.ReleaseMutex();
-            lock (_loader.SynchronizationContext)
-            {
-                try
-                {
-                    if (_isNewHistoryJustLoaded)
-                    {
-                        return true;
-                    }
-                    return _loader.LoadData();
-                }
-                finally
-                {
-                    _locker.WaitOne();
-                }
-            }
+            _loader.DeregisterHistoryProvider(this);
         }
     }
 }

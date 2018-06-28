@@ -1,16 +1,23 @@
 ﻿using Sowalabs.Bison.ProfitSim.Events;
 using System;
 using System.Collections.Generic;
+// ReSharper disable FieldCanBeMadeReadOnly.Local -> fields are not made readonly as a speed optimization.
+
 
 namespace Sowalabs.Bison.ProfitSim
 {
+    /// <summary>
+    /// Queue of simulation events.
+    /// </summary>
+    /// <remarks>Qeueue is implemented with a list where events are ordered in descending order - next event is on last position in list and last event is first in list.
+    /// Events are ordered first by time and then priority (each simulation event type has a distinct priority). </remarks>
     internal class SimEventQueue
     {
         private class QueueEntry
         {
-            public DateTime SimTime;
-            public int Priority;
-            public ISimEvent Event;
+            internal DateTime SimTime;
+            internal int Priority;
+            internal ISimEvent Event;
 
             public QueueEntry(ISimEvent simEvent)
             {
@@ -47,8 +54,15 @@ namespace Sowalabs.Bison.ProfitSim
         
         private List<QueueEntry> _queue = new List<QueueEntry>();
 
+        /// <summary>
+        /// Enqueues given event into queue.
+        /// </summary>
+        /// <param name="simEvent">Event to be enqueued into queue.</param>
         public void Enqueue(ISimEvent simEvent)
         {
+
+            // Event is positioned using bisection.
+
             var min = 0;
             var max = _queue.Count;
             var newEntry = new QueueEntry(simEvent);
@@ -78,6 +92,10 @@ namespace Sowalabs.Bison.ProfitSim
             _queue.Insert(max, newEntry);
         }
 
+        /// <summary>
+        /// Dequeues next event from queue.
+        /// </summary>
+        /// <returns>Event next in queue.</returns>
         public ISimEvent Dequeue()
         {
             var count = _queue.Count;
@@ -90,18 +108,22 @@ namespace Sowalabs.Bison.ProfitSim
             return entry.Event;
         }
 
+        /// <summary>
+        /// Removes event from queue.
+        /// </summary>
+        /// <param name="simEvent">Event to be removed from queue.</param>
         public void Remove(ISimEvent simEvent)
         {
             _queue.RemoveAll(entry => entry.Event == simEvent);
         }
 
+        /// <summary>
+        /// Returns last event in queue.
+        /// </summary>
+        /// <returns>Last event in queue.</returns>
         public ISimEvent PeekLast()
         {
-            if (_queue.Count == 0)
-            {
-                return null;
-            }
-            return _queue[0].Event;
+            return _queue.Count == 0 ? null : _queue[0].Event;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Windows.Forms;
 
 namespace Sowalabs.Bison.ProfitSim
@@ -11,9 +12,12 @@ namespace Sowalabs.Bison.ProfitSim
         [STAThread]
         private static void Main()
         {
+            ServicePointManager.DefaultConnectionLimit = 5;
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MultiProfitSimForm());
+            //Application.Run(new CleanupForm());
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Sowalabs.Bison.ProfitSim
+﻿using Sowalabs.Bison.ProfitSim.Config;
+
+namespace Sowalabs.Bison.ProfitSim
 {
     partial class ProfitSimForm
     {
@@ -78,7 +80,7 @@
             // 
             // simConfigSource
             // 
-            this.simConfigSource.DataSource = typeof(Sowalabs.Bison.ProfitSim.ProfitSimulationConfig);
+            this.simConfigSource.DataSource = typeof(SimulationScenario);
             // 
             // reservationPeriod
             // 
@@ -259,7 +261,7 @@
             // 
             // customerConfigSource
             // 
-            this.customerConfigSource.DataSource = typeof(Sowalabs.Bison.ProfitSim.CustomerGenerator.Config);
+            this.customerConfigSource.DataSource = typeof(Sowalabs.Bison.ProfitSim.CustomerGenerating.CustomerGeneratorConfig);
             // 
             // ProfitSimForm
             // 

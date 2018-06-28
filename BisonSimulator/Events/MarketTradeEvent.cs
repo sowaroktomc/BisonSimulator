@@ -5,16 +5,30 @@ using Sowalabs.Bison.Common.Extensions;
 
 namespace Sowalabs.Bison.ProfitSim.Events
 {
+    /// <summary>
+    /// Simulates a trade being executed on market.
+    /// </summary>
     class MarketTradeEvent : ISimEvent
     {
         private readonly SimulationDependencyFactory _dependencyFactory;
         private readonly decimal? _amount;
         private readonly decimal? _value;
         private readonly BuySell _buySell;
-        private DateTime _simTime;
 
-        public DateTime SimTime { get { return _simTime; } set { _simTime = value; } }
+        /// <inheritdoc />
+        /// <summary>
+        /// Date and time at which the event takes place.
+        /// </summary>
+        public DateTime SimTime { get; set; }
 
+        /// <summary>
+        /// Simulates a trade being executed on market.
+        /// </summary>
+        /// <param name="dependencyFactory"></param>
+        /// <param name="requestAtTime">Date and time at which the event takes place.</param>
+        /// <param name="requestAmount">Amount to be traded. If not given then requestValue is required.</param>
+        /// <param name="requestValue">Value to be traded. If not given then requestAmount is required</param>
+        /// <param name="buySell">Is crypto-currency bought or sold.</param>
         public MarketTradeEvent(SimulationDependencyFactory dependencyFactory, DateTime requestAtTime, decimal? requestAmount, decimal? requestValue, BuySell buySell)
         {
             _dependencyFactory = dependencyFactory;
@@ -22,9 +36,13 @@ namespace Sowalabs.Bison.ProfitSim.Events
             _value = requestValue;
             _buySell = buySell;
 
-            _simTime = requestAtTime;
+            SimTime = requestAtTime;
         }
 
+        /// <inheritdoc />
+        /// <summary>
+        /// Simulates the event.
+        /// </summary>
         public void Simulate()
         {
             switch (_buySell)

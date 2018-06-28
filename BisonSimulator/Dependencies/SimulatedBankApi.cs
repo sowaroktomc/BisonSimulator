@@ -1,6 +1,6 @@
 ﻿namespace Sowalabs.Bison.ProfitSim.Dependencies
 {
-    class SimulatedBankApi : Sowalabs.Bison.LiquidityEngine.Dependencies.IBankApi
+    class SimulatedBankApi : LiquidityEngine.Dependencies.IBankApi
     {
         public decimal Balance { get; private set; }
 

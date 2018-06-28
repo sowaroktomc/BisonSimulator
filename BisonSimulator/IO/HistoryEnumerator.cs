@@ -4,94 +4,103 @@ using System.Collections.Generic;
 
 namespace Sowalabs.Bison.ProfitSim.IO
 {
-    internal class HistoryEnumerator : IHistoryEnumerator
+    /// <summary>
+    /// Iterates multiple times over order book history and loads new data when needed.
+    /// </summary>
+    internal class HistoryEnumerator : IHistoryProvider
     {
-        private int _currentIndex;
+        private LinkedListNode<OrderBook> _currentNode;
         private readonly BitstampHistoryLoader _loader;
-        private System.Threading.Mutex _locker = new System.Threading.Mutex();
-        private bool _isNewHistoryJustLoaded;
+        private readonly object _locker = new object();
+        private int? _lastPeriodSynchronizationToken;
+        private readonly LinkedList<OrderBook> _history = new LinkedList<OrderBook>();
 
 
-        private readonly List<OrderBook> _history = new List<OrderBook>();
-
+        /// <summary>
+        /// Iterates over order book history and loads new data using given history loader when needed.
+        /// </summary>
+        /// <param name="loader">Order book history loader which is then used to load historical data.</param>
         public HistoryEnumerator(BitstampHistoryLoader loader)
         {
             _loader = loader;
-            _loader.RegisterEnumerator(this);
+            _loader.RegisterHistoryProvider(this);
         }
 
-        public void AppendHistory(List<OrderBook> history)
+        /// <summary>
+        /// Append additional history to internal storage.
+        /// </summary>
+        /// <param name="history">List of history entries to append.</param>
+        /// <param name="periodSynchronizationToken">Token identifying time period from which historical data is from.</param>
+        public void AppendHistory(List<OrderBook> history, int periodSynchronizationToken)
         {
-            _locker.WaitOne();
-            try
+            lock (_locker)
             {
-                _history.AddRange(history);
-                _isNewHistoryJustLoaded = true;
-            }
-            finally
-            {
-                _locker.ReleaseMutex();
+                history.ForEach(entry => _history.AddLast(entry));
+                _lastPeriodSynchronizationToken = periodSynchronizationToken;
             }
         }
 
+        /// <summary>
+        /// Moves iterator to next entry and return next order book entry from history. If no more historical data is available, returns null.
+        /// </summary>
+        /// <returns>Next order book entry or null if no more is available.</returns>
         public OrderBook GetNext()
         {
-            _locker.WaitOne();
-            try
+            LinkedListNode<OrderBook> nextNode;
+            int? periodSynchronizationToken;
+            lock (_locker)
             {
-                if (_currentIndex >= _history.Count)
-                {
-                    if (!LoadNewData())
-                    {
-                        return null;
-                    }
-                }
+                nextNode = _currentNode != null ? _currentNode.Next : _history.First;
+                periodSynchronizationToken = _lastPeriodSynchronizationToken;
+            }
 
-                return _history[_currentIndex++];
-            } finally
+            if (nextNode == null)
             {
-                _locker.ReleaseMutex();
+                if (!_loader.LoadData(periodSynchronizationToken))
+                {
+                    return null;
+                }
+            }
+
+            lock (_locker)
+            {
+                _currentNode = _currentNode != null ? _currentNode.Next : _history.First;
+                return _currentNode?.Value;
             }
         }
-
-
+        
+        /// <summary>
+        /// Removes first entry from storage, restarts history iterator and returns whether any more history entries are available.
+        /// </summary>
+        /// <returns>True if more history entries are available. False othervise.</returns>
         public bool Restart()
         {
-            _locker.WaitOne();
-            try
-            { _history.RemoveAt(0);
-                _currentIndex = 0;
+            int historyCount;
+            int? periodSynchronizationToken;
 
-                if (_history.Count == 0)
-                {
-                    return LoadNewData();
-                }
-
-                return true;
-            } finally
+            lock (_locker)
             {
-                _locker.ReleaseMutex();
+                _history.RemoveFirst();
+                _currentNode = null;
+
+                historyCount = _history.Count;
+                periodSynchronizationToken = _lastPeriodSynchronizationToken;
             }
+
+            if (historyCount == 0)
+            {
+                return _loader.LoadData(periodSynchronizationToken);
+            }
+
+            return true;
         }
 
-        private bool LoadNewData()
+        /// <summary>
+        /// Closes enumerator.
+        /// </summary>
+        public void Close()
         {
-            _isNewHistoryJustLoaded = false;
-            _locker.ReleaseMutex();
-            lock (_loader.SynchronizationContext)
-            {
-                try
-                {
-                    if (_isNewHistoryJustLoaded)
-                    {
-                        return true;
-                    }
-                    return _loader.LoadData();
-                } finally
-                {
-                    _locker.WaitOne();
-                }
-            }
+            _loader.DeregisterHistoryProvider(this);
         }
     }
 }

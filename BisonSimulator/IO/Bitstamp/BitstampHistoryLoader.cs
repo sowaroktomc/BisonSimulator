@@ -1,92 +1,181 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Sowalabs.Bison.Common.Environment;
+using Sowalabs.Bison.ProfitSim.IO.Bitstamp.Model;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using Newtonsoft.Json;
-using Sowalabs.Bison.Common.Environment;
-using Sowalabs.Bison.ProfitSim.IO.Bitstamp.Model;
 
 namespace Sowalabs.Bison.ProfitSim.IO.Bitstamp
 {
+    /// <summary>
+    /// Loads Bitstamp order book history from web. Data is loaded in sections.
+    /// </summary>
     internal class BitstampHistoryLoader
     {
-        private readonly List<IHistoryEnumerator> _enumerators = new List<IHistoryEnumerator>();
-
-        private readonly DateTime _fromDate;
-        private readonly DateTime _toDate;
-        private DateTime _currentDate;
-        private static object _synchronizationContext = new object();
-        public object SynchronizationContext {  get { return _synchronizationContext; } }
-
+        /// <summary>
+        /// Crypto-currency the loader is loading data for.
+        /// </summary>
         public Crypto Crypto { get; }
 
-        public BitstampHistoryLoader(Crypto crypto, DateTime? fromDateTime, DateTime? toDateTime)
-        {
-            Crypto = crypto;
-            _fromDate = fromDateTime ?? new DateTime(2018, 4, 4, 0, 0, 0);
-            _toDate = toDateTime ?? new DateTime(2018, 5, 1, 0, 0, 0);
-            _currentDate = _fromDate;
-        }
+        private readonly List<IHistoryProvider> _loaders = new List<IHistoryProvider>();
+        private readonly DateTime _toDateTime;
+        private readonly object _locker = new object();
 
-        public void Restart()
+        private DateTime _nextDateTimeToLoad;
+        private int _lastPeriodSynchronizationToken;
+
+
+        /// <summary>
+        /// Loads Bitstamp order book history from web. Data is loaded in sections.
+        /// </summary>
+        /// <param name="crypto">Crypto-currency the loader will load data for.</param>
+        /// <param name="fromDateTime">Date and time from when the history will be loaded from.</param>
+        /// <param name="toDateTime">Date and time to when the history will be loaded to.</param>
+        public BitstampHistoryLoader(Crypto crypto, DateTime fromDateTime, DateTime toDateTime)
         {
-            lock (SynchronizationContext)
+            if (fromDateTime == DateTime.MinValue)
             {
-                _currentDate = _fromDate;
+                throw new ArgumentNullException(nameof(fromDateTime));
             }
-        }
-
-        private string GetAddress()
-        {
-            return $"http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_{Crypto}eur_{_currentDate.Year:D4}/orders_{_currentDate.Year:D4}_{_currentDate.Month:D2}_{_currentDate.Day:D2}_{_currentDate.Hour:D2}";
-        }
-
-        public bool LoadData()
-        {
-            lock (SynchronizationContext)
+            if (toDateTime == DateTime.MinValue)
             {
-                if (_currentDate > _toDate)
+                throw new ArgumentNullException(nameof(toDateTime));
+            }
+
+            Crypto = crypto;
+
+            // As data from exchange is stored by hours, from and to times are floored to hour part.
+            _nextDateTimeToLoad = fromDateTime.Date.AddHours(fromDateTime.Hour);
+            _toDateTime = toDateTime.Date.AddHours(toDateTime.Hour);
+        }
+
+        /// <summary>
+        /// Load new data from source. Data will only be loaded if given synchronization token is valid (last).
+        /// </summary>
+        /// <param name="periodSynchronizationToken">Token with which caller identifies its current history state. Data is only loaded if the state is most current.</param>
+        /// <returns>True if data has been loaded. False otherwise (no more data available).</returns>
+        public bool LoadData(int? periodSynchronizationToken)
+        {
+            lock (_locker)
+            {
+                if ((periodSynchronizationToken + 1 ?? 1) <= _lastPeriodSynchronizationToken)
+                {
+                    // Period has already been loaded -> return a successfull loading.
+                    return true;
+                }
+
+                if (_nextDateTimeToLoad > _toDateTime)
                 {
                     return false;
                 }
 
-                var orderBookHistory = new List<Common.Trading.OrderBook>();
+                var filename = GetNextCachedFilename();
 
-                using (var webClient = new WebClient())
+                if (!File.Exists(filename) || new FileInfo(filename).Length == 0)
                 {
-                    var address = GetAddress();
-                    Trace.Write("Loading data from " + address);
 
-                    using (var reader = new JsonTextReader(new StreamReader(webClient.OpenRead(address))))
+                    if (!Directory.Exists(".\\Cache"))
                     {
-                        reader.SupportMultipleContent = true;
-                        var serializer = new JsonSerializer();
-                        while (reader.Read())
-                        {
-                            reader.Read(); //Each JSON is prefixed with a timestamp value - skip it.
-                            orderBookHistory.Add(Convert(serializer.Deserialize<OrderBook>(reader)));
-                        }
+                        Directory.CreateDirectory(".\\Cache");
                     }
-                    Trace.WriteLine("   -   done.");
+
+                    StoreDataToCacheFile(filename);
                 }
 
-                _enumerators.ForEach(enumerator => enumerator.AppendHistory(orderBookHistory));
-                _currentDate = _currentDate.AddHours(1);
+                // Sometimes there is no data in source -> the loaded data is an exception description.
+                if (new FileInfo(filename).Length < 1000000)
+                {
+                    Trace.WriteLine($"{Crypto} error in data detected, skipping period!");
+                    _nextDateTimeToLoad = _nextDateTimeToLoad.AddHours(1);
+                    return LoadData(periodSynchronizationToken);
+                }
+
+
+                var orderBookHistory = LoadOrderbooksFromFile(filename);
+
+                _lastPeriodSynchronizationToken++;
+                _loaders.ForEach(enumerator => enumerator.AppendHistory(orderBookHistory, _lastPeriodSynchronizationToken));
+                _nextDateTimeToLoad = _nextDateTimeToLoad.AddHours(1);
                 return true;
             }
         }
 
-        public void RegisterEnumerator(IHistoryEnumerator enumerator)
+        /// <summary>
+        /// Loads orderbook historical data from given file.
+        /// </summary>
+        /// <param name="filename">Name of file to load orderbook historical data from.</param>
+        /// <returns>List of loaded orderbooks.</returns>
+        private List<Common.Trading.OrderBook> LoadOrderbooksFromFile(string filename)
         {
-            if (_currentDate > _fromDate)
+            using (var reader = new JsonTextReader(new StreamReader(filename)))
             {
-                throw new Exception("Adding data enumerator after data has been loaded.");
+                var orderBookHistory = new List<Common.Trading.OrderBook>();
+                Trace.WriteLine("Loading data from " + filename);
+                reader.SupportMultipleContent = true;
+                var serializer = new JsonSerializer();
+                while (reader.Read())
+                {
+                    reader.Read(); //Each JSON is prefixed with a timestamp value - skip it.
+                    orderBookHistory.Add(Convert(serializer.Deserialize<OrderBook>(reader)));
+                }
+
+                Trace.WriteLine($"{Crypto} loading done.");
+
+                return orderBookHistory;
             }
-            _enumerators.Add(enumerator);
         }
 
+        /// <summary>
+        /// Downloads orderbook historical data from web and stores it into given file.
+        /// </summary>
+        /// <param name="filename">Name of file to store data into.</param>
+        private void StoreDataToCacheFile(string filename)
+        {
+            using (var webClient = new WebClient())
+            {
+                var address = GetNextWebAddress();
+                Trace.WriteLine("Downloading data from " + address);
+                webClient.DownloadFile(address, filename);
+                Trace.WriteLine($"{Crypto} downloading done.");
+            }
+        }
+
+        /// <summary>
+        /// Registers given history provider to recieve all future loaded data.
+        /// </summary>
+        /// <param name="provider">Provider to recieve all future loaded data.</param>
+        public void RegisterHistoryProvider(IHistoryProvider provider)
+        {
+            lock (_locker)
+            {
+                if (_lastPeriodSynchronizationToken > 0)
+                {
+                    throw new Exception("Adding data provider after data has been loaded.");
+                }
+
+                _loaders.Add(provider);
+            }
+        }
+
+        /// <summary>
+        /// Deregisters given history provider from recieving any future loaded data.
+        /// </summary>
+        /// <param name="provider">Provider which stops recieving all future loaded data.</param>
+        public void DeregisterHistoryProvider(IHistoryProvider provider)
+        {
+            lock (_locker)
+            {
+                _loaders.Remove(provider);
+            }
+        }
+
+
+        /// <summary>
+        /// Converts bistamp orderbook data into Bison data.
+        /// </summary>
         private Common.Trading.OrderBook Convert(OrderBook bitstampBook)
         {
             return new Common.Trading.OrderBook
@@ -97,9 +186,22 @@ namespace Sowalabs.Bison.ProfitSim.IO.Bitstamp
             };
         }
 
+        /// <summary>
+        /// Converts bistamp orderbook entry into Bison data.
+        /// </summary>
         private static Common.Trading.OrderBookEntry Convert(Offer bitstampOffer)
         {
             return new Common.Trading.OrderBookEntry { Amount = bitstampOffer.Order.Amount, Price = bitstampOffer.Order.Price};
+        }
+
+        private string GetNextWebAddress()
+        {
+            return $"http://api.sowalabs.com/cryptotickernest/api/get/bitstamp_{Crypto}eur_{_nextDateTimeToLoad.Year:D4}/orders_{_nextDateTimeToLoad.Year:D4}_{_nextDateTimeToLoad.Month:D2}_{_nextDateTimeToLoad.Day:D2}_{_nextDateTimeToLoad.Hour:D2}";
+        }
+
+        private string GetNextCachedFilename()
+        {
+            return $".\\Cache\\bitstamp_{Crypto}eur_orders_{_nextDateTimeToLoad.Year:D4}_{_nextDateTimeToLoad.Month:D2}_{_nextDateTimeToLoad.Day:D2}_{_nextDateTimeToLoad.Hour:D2}";
         }
     }
 }

@@ -1,3 +1,5 @@
+{
+"StartDateTime":"2018-04-04T00:00:00", "ToDateTime":"2018-05-01T00:00:00", "Scenarios":
 [
 {"OutputFilename":"Risk2Scenario1_Buy", "HedgingDelay":0,"BuySpread":0.5,"SellSpread":0.5,"Customers":[
 {"BuySell":"Buy","Value":5000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":6},
@@ -164,3 +166,4 @@
 {"BuySell":"Sell","Value":10000,"AcceptsOffer":true,"RequestDelay":0,"AcceptRejectDelay":1800}
 ]},
 ]
+}

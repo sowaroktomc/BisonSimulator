@@ -2,23 +2,31 @@
 
 namespace Sowalabs.Bison.ProfitSim.Events
 {
+    /// <inheritdoc />
+    /// <summary>
+    /// Simulates a timer event.
+    /// </summary>
     internal class TimerEvent : ISimEvent
     {
 
         private readonly Action _action;
-        private DateTime _simTime;
 
-        public DateTime SimTime { get { return _simTime; } set { _simTime = value; } }
+        public DateTime SimTime { get; set; }
 
+        /// <summary>
+        /// Simulates a timer event.
+        /// </summary>
+        /// <param name="actionTime">Date and time the timer fires.</param>
+        /// <param name="action">Action executed when timer fires.</param>
         public TimerEvent(DateTime actionTime, Action action)
         {
-            this._simTime = actionTime;
-            this._action = action;
+            SimTime = actionTime;
+            _action = action;
         }
 
         public void Simulate()
         {
-            this._action();
+            _action();
         }
     }
 }
