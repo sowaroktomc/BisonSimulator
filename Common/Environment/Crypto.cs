@@ -2,10 +2,10 @@
 {
     public enum Crypto
     {
-        /// <summary>
-        /// Bitcoin cach
-        /// </summary>
-        Bch,
+//        /// <summary>
+//        /// Bitcoin cach
+//        /// </summary>
+//        Bch,
         /// <summary>
         /// Bitcoin
         /// </summary>
