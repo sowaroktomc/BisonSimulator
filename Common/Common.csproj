@@ -43,6 +43,8 @@
     <Compile Include="BisonApi\IHedgingService.cs" />
     <Compile Include="BisonApi\ILiquidityProviderService.cs" />
     <Compile Include="BisonApi\IPricingService.cs" />
+    <Compile Include="DateTimeProvider\DateTimeProvider.cs" />
+    <Compile Include="DateTimeProvider\IDateTimeProvider.cs" />
     <Compile Include="Environment\AccountData.cs" />
     <Compile Include="Environment\BankData.cs" />
     <Compile Include="Environment\Crypto.cs" />

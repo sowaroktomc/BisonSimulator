@@ -8,17 +8,17 @@ namespace Sowalabs.Bison.LiquidityEngine.Tasks
 
         private readonly MoneyTransferData _data;
 
-        public TransferFromCustomerTask(IDependencyFactory dependencyFactory, MoneyTransferData data) : base(dependencyFactory)
+        public TransferFromCustomerTask(IDependencyFactory dependencyFactory, LiquidityEngine engine, MoneyTransferData data) : base(dependencyFactory, engine)
         {
             _data = data;
         }
 
-        protected override bool ExecuteTask()
+        protected override ExecutionStatus ExecuteTask()
         {
             var solaris = this.DependencyFactory.GetBankApi(_data.FromSwift);
-            solaris.TransferMoney(_data.FromIban, _data.ToIban, _data.Amount);
+            solaris.TransferMoney(_data.FromIban, _data.ToIban, _data.Amount, string.Empty, string.Empty);
 
-            return true;
+            return ExecutionStatus.Done;
         }
     }
 }

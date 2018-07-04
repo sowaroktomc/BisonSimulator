@@ -4,5 +4,6 @@
     {
         public Currency Currency { get; set; }
         public string Iban { get; set; }
+        public string AccountNumber { get; set; }
     }
 }

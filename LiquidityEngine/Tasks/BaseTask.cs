@@ -5,46 +5,64 @@ namespace Sowalabs.Bison.LiquidityEngine.Tasks
 {
     public abstract class BaseTask
     {
+        protected enum ExecutionStatus
+        {
+            Done,
+            Repeat,
+            Error
+        }
         private const int MaxRetryCount = 5;
 
-        private DateTime _executeAtTime;
+        public DateTime ExecuteAtTime { get; private set; }
         private int _retryCount;
+        protected LiquidityEngine Engine { get; }
         protected IDependencyFactory DependencyFactory { get; }
 
-        protected BaseTask(IDependencyFactory dependencyFactory)
+        protected BaseTask(IDependencyFactory dependencyFactory, LiquidityEngine engine)
         {
-            this._executeAtTime = DateTime.Now;
-            this.DependencyFactory = dependencyFactory;
+            ExecuteAtTime = dependencyFactory.DateTimeProvider.Now;
+            DependencyFactory = dependencyFactory;
+            Engine = engine;
         }
 
-        protected abstract bool ExecuteTask();
+        protected abstract ExecutionStatus ExecuteTask();
 
         public bool ShouldExecute()
         {
-            return DateTime.Now >= this._executeAtTime;
+            return DependencyFactory.DateTimeProvider.Now >= ExecuteAtTime;
         }
 
         public void Execute()
         {
             try
             {
-                var executeSuccess = this.ExecuteTask();
+                var executeSuccess = ExecuteTask();
 
-                if (executeSuccess)
+                switch (executeSuccess)
                 {
-                    return;
+                    case ExecutionStatus.Done:
+                        return;
+                    case ExecutionStatus.Repeat:
+                        ExecuteAtTime = DependencyFactory.DateTimeProvider.Now.AddSeconds(10);
+                        Engine.Queue.Enqueue(this);
+                        return;
+                    case ExecutionStatus.Error:
+                        _retryCount++;
+                        ExecuteAtTime = DependencyFactory.DateTimeProvider.Now.AddSeconds(_retryCount);
+
+                        if (_retryCount > MaxRetryCount)
+                        {
+                            // TODO Notify someone!
+                            return;
+                        }
+
+                        Engine.Queue.Enqueue(this);
+                        return;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
 
-                this._retryCount++;
-                _executeAtTime = DateTime.Now.AddSeconds(this._retryCount);
 
-                if (this._retryCount > MaxRetryCount)
-                {
-                    // TODO Notify someone!
-                    return;
-                }
-
-                Queue.Instance.AddTaskToQueue(this);
             }
             catch
             {

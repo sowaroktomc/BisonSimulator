@@ -41,7 +41,6 @@ namespace Sowalabs.Bison.Hedger
             }
 
             this._whenStrategies.ForEach(strategy => strategy.RegisterAcceptedOffer(offer));
-
         }
 
         public void ExecuteOffers()

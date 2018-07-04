@@ -11,8 +11,13 @@ namespace Sowalabs.Bison.ProfitSim
     {
         private readonly SimEventQueue _queue = new SimEventQueue();
 
+        public SimulationEngine(DateTime simulationStartTime)
+        {
+            CurrentTime = simulationStartTime;
+        }
+
         /// <summary>
-        /// Current time in simulation world.
+        /// Gets current time in simulation world.
         /// </summary>
         public DateTime CurrentTime { get; private set; }
 

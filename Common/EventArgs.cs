@@ -8,7 +8,7 @@ namespace Sowalabs.Bison.Common
 
         public EventArgs(T value)
         {
-            this.Value = value;
+            Value = value;
         }
     }
 }

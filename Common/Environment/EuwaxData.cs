@@ -14,8 +14,8 @@ namespace Sowalabs.Bison.Common.Environment
 
             // TODO Load from settings!
             Solaris = new BankData("SolarisSwiftCode");
-            Solaris.AddAccount(new AccountData {Currency = Currency.Eur, Iban = "EuwaxEur@Solaris"});
-            Solaris.AddAccount(new AccountData {Currency = Currency.Usd, Iban = "EuwaxUsd@Solaris"});
+            Solaris.AddAccount(new AccountData {Currency = Currency.Eur, Iban = "EuwaxEur@Solaris", AccountNumber = "EuwaxEur@Solaris" });
+            Solaris.AddAccount(new AccountData {Currency = Currency.Usd, Iban = "EuwaxUsd@Solaris", AccountNumber = "EuwaxUsd@Solaris" });
 
             BankAccounts.Add(Solaris.SwiftCode, Solaris);
 

@@ -9,10 +9,13 @@ namespace Sowalabs.Bison.ProfitSim.Dependencies
     {
         public SimulatedMarketApi BitcoinMarketApi { get; }
         public SimulatedTimerFactory TimerFactory { get; }
+
         public Pricing.PricingEngine PricingEngine { get; }
         public Hedger.HedgingEngine HedgingEngine { get; }
-        public LiquidityEngine.LiquidityEngine LiquidityEngine { get; }
         public SimulatedBankApi SolarisBank { get; }
+
+        private readonly SimulationEngine _engine;
+        public SimulatedDateTimeProvider DateTimeProvider { get; }
 
 
         /// <summary>
@@ -20,13 +23,15 @@ namespace Sowalabs.Bison.ProfitSim.Dependencies
         /// </summary>
         public SimulationDependencyFactory(SimulationEngine engine)
         {
+            _engine = engine;
+
             BitcoinMarketApi = new SimulatedMarketApi {SubstractAmountsFromBooks = true};
-            TimerFactory = new SimulatedTimerFactory(engine);
+            TimerFactory = new SimulatedTimerFactory(_engine);
             PricingEngine = new Pricing.PricingEngine(this);
             HedgingEngine = new Hedger.HedgingEngine(this);
-            LiquidityEngine = new LiquidityEngine.LiquidityEngine(this);
+            DateTimeProvider = new SimulatedDateTimeProvider(_engine);
 
-            SolarisBank = new SimulatedBankApi();
+            SolarisBank = new SimulatedBankApi(_engine);
         }
 
         #region Hedger
@@ -57,6 +62,15 @@ namespace Sowalabs.Bison.ProfitSim.Dependencies
         {
             return SolarisBank;
         }
+
+        LiquidityEngine.Dependencies.IResetEvent LiquidityEngine.Dependencies.IDependencyFactory.CreateResetEvent()
+        {
+            return new SimulatedResetEvent(_engine);
+        }
+
+        Common.DateTimeProvider.IDateTimeProvider LiquidityEngine.Dependencies.IDependencyFactory.DateTimeProvider => DateTimeProvider;
+        Common.Timer.ITimerFactory LiquidityEngine.Dependencies.IDependencyFactory.TimerFactory => TimerFactory;
+
 
         #endregion
 

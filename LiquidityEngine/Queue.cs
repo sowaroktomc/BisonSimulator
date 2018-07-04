@@ -2,60 +2,45 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Sowalabs.Bison.LiquidityEngine.Dependencies;
 
 namespace Sowalabs.Bison.LiquidityEngine
 {
-
-
-    public class Queue : IDisposable
+    public class Queue : IQueue
     {
-        protected static Queue SingletonInstance;
-        private static readonly object SingletonPadlock = new object();
-
-        public static Queue Instance
+        internal Queue(IDependencyFactory dependencyFactory)
         {
-            get
-            {
-                lock (SingletonPadlock)
-                {
-                    return SingletonInstance ?? (SingletonInstance = new Queue());
-                }
-            }
-        }
-
-        protected Queue()
-        {
-            this._tasks = new List<BaseTask>();
-            this._workerBarrier = new ManualResetEventSlim(false);
-            this._worker = new Thread(ExecuteTasks);
-            this._worker.Start();
+            _tasks = new List<BaseTask>();
+            _workerBarrier = dependencyFactory.CreateResetEvent();
+            _isWorkerRunning = true;
+            _worker = new Thread(ExecuteTasks);
+            _worker.Start();
         }
 
         private readonly List<BaseTask> _tasks;
-        private readonly ManualResetEventSlim _workerBarrier;
+        private readonly IResetEvent _workerBarrier;
         private Thread _worker;
         private bool _isWorkerRunning;
 
         public virtual void Enqueue(BaseTask task)
         {
-            this.AddTaskToQueue(task);
-            this._workerBarrier.Set();
+            ProcessTask(task);
         }
 
         internal void AddTaskToQueue(BaseTask task)
         {
-            lock (this._tasks)
+            lock (_tasks)
             {
-                this._tasks.Add(task);
+                _tasks.Add(task);
             }
         }
 
         private void ExecuteTasks()
         {
-            while (this._isWorkerRunning)
+            while (_isWorkerRunning)
             {
 
-                this._workerBarrier.Wait(1000);
+                _workerBarrier.Wait(1000);
 
                 List<BaseTask> tasksToExecute;
                 lock (_tasks)
@@ -66,15 +51,20 @@ namespace Sowalabs.Bison.LiquidityEngine
 
                 foreach (var task in tasksToExecute)
                 {
-                    if (!task.ShouldExecute())
-                    {
-                        this.AddTaskToQueue(task);
-                    }
-                    else
-                    {
-                        task.Execute();
-                    }
+                    ProcessTask(task);
                 }
+            }
+        }
+
+        private void ProcessTask(BaseTask task)
+        {
+            if (!task.ShouldExecute())
+            {
+                AddTaskToQueue(task);
+            }
+            else
+            {
+                task.Execute();
             }
         }
 
@@ -86,13 +76,16 @@ namespace Sowalabs.Bison.LiquidityEngine
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!disposing)
             {
-                this._isWorkerRunning = false;
-                this._workerBarrier.Set();
-                this._worker?.Join();
-                this._worker = null;
+                return;
             }
+
+            _isWorkerRunning = false;
+            _workerBarrier.Set();
+            _worker?.Join();
+            _worker = null;
+            _workerBarrier.Dispose();
         }
     }
 }

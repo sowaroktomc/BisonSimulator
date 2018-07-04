@@ -1,6 +1,7 @@
 ﻿using Sowalabs.Bison.Common.Trading;
 using Sowalabs.Bison.Pricing;
 using System;
+using Sowalabs.Bison.Common.Environment;
 using Sowalabs.Bison.ProfitSim.Dependencies;
 
 namespace Sowalabs.Bison.ProfitSim.Events
@@ -10,7 +11,7 @@ namespace Sowalabs.Bison.ProfitSim.Events
     /// </summary>
     internal class NewPriceRequestEvent : ISimEvent
     {
-        private readonly PricingEngine _pricingEngine;
+        private readonly SimulationDependencyFactory _dependencyFactory;
         private readonly decimal? _amount;
         private readonly decimal? _value;
         private readonly BuySell _buySell;
@@ -36,7 +37,7 @@ namespace Sowalabs.Bison.ProfitSim.Events
         /// <param name="buySell">Is crypto-currency bought or sold.</param>
         public NewPriceRequestEvent(SimulationDependencyFactory dependencyFactory, DateTime requestAtTime, decimal? requestAmount, decimal? requestValue, BuySell buySell)
         {
-            _pricingEngine = dependencyFactory.PricingEngine;
+            _dependencyFactory = dependencyFactory;
             _amount = requestAmount;
             _value = requestValue;
             _buySell = buySell;
@@ -52,12 +53,18 @@ namespace Sowalabs.Bison.ProfitSim.Events
             switch (_buySell)
             {
                 case BuySell.Buy:
-                    Offer = _pricingEngine.GetBuyOffer(_amount, _value);
+                    Offer = _dependencyFactory.PricingEngine.GetBuyOffer(_amount, _value);
                     break;
                 case BuySell.Sell:
-                    Offer = _pricingEngine.GetSellOffer(_amount, _value);
+                    Offer = _dependencyFactory.PricingEngine.GetSellOffer(_amount, _value);
                     break;
             }
+
+            Offer.UserAccount = "SimAccount";
+            Offer.UserId = 777;
+            Offer.Currency = Currency.Eur;
+            Offer.OpenTimeStamp = _dependencyFactory.DateTimeProvider.Now;
+            Offer.Reference = Guid.NewGuid().ToString();
         }
     }
 }

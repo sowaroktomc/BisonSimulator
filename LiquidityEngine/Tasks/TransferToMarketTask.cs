@@ -13,12 +13,12 @@ namespace Sowalabs.Bison.LiquidityEngine.Tasks
             _data = data;
         }
 
-        protected override bool ExecuteTask()
+        protected override ExecutionStatus ExecuteTask()
         {
             var bank = DependencyFactory.GetBankApi(_data.FromSwift);
-            bank.TransferMoney(_data.FromIban, _data.ToIban, _data.Amount);
+            bank.TransferMoney(_data.FromIban, _data.ToIban, _data.Amount, string.Empty, string.Empty);
 
-            return true;
+            return ExecutionStatus.Done;
         }
     }
 }

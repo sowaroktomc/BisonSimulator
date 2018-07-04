@@ -7,8 +7,8 @@ using Sowalabs.Bison.ProfitSim.Events;
 using Sowalabs.Bison.ProfitSim.IO;
 using Sowalabs.Bison.ProfitSim.IO.Bitstamp;
 using Sowalabs.Bison.ProfitSim.IO.Output;
-using Sowalabs.Bison.ProfitSim.SimulationMoqs;
 using System;
+using Sowalabs.Bison.ProfitSim.SimulationMoqs;
 
 namespace Sowalabs.Bison.ProfitSim
 {
@@ -19,6 +19,7 @@ namespace Sowalabs.Bison.ProfitSim
     {
         private readonly SimulationDependencyFactory _dependencyFactory;
         private readonly SimulationEngine _engine;
+        private readonly LiquidityEngine.LiquidityEngine _liquidityEngine;
         private readonly SimulationScenario _scenario;
         private readonly IProfitSimulationWriter _resultWriter;
         private readonly HistoryEnumerator _historyEnumerator;
@@ -32,22 +33,33 @@ namespace Sowalabs.Bison.ProfitSim
         /// <param name="historyLoader">Loader to be used to access history of market order books.</param>
         public ProfitSimulator(SimulationScenario scenario, BitstampHistoryLoader historyLoader)
         {
-            _engine = new SimulationEngine();
+            _historyEnumerator = new HistoryEnumerator(historyLoader);
+            var firstEntry = _historyEnumerator.PeekNext();
+
+            if (firstEntry == null)
+            {
+                return;
+            }
+
+            _engine = new SimulationEngine(firstEntry.AcqTime);
             _engine.AfterEventSimulation += LoadOrderBookHistoryEventsIntoEngine;
 
+
             _dependencyFactory = new SimulationDependencyFactory(_engine);
-            LiquidityEngineQueueMoq.EnsureInstanceCreated();
 
             _scenario = scenario;
             _dependencyFactory.HedgingEngine.WhenStrategy.Delay = _scenario.HedgingDelay * 1000;
             _dependencyFactory.PricingEngine.PricingStrategy.SellSpread = _scenario.SellSpread / 100;
             _dependencyFactory.PricingEngine.PricingStrategy.BuySpread = _scenario.BuySpread / 100;
+            _dependencyFactory.SolarisBank.InfiniteBalance = true;
+            _dependencyFactory.SolarisBank.TransferDelay = 10;
 
             _resultWriter = new CsvProfitSimulationWriter(_scenario.OutputFilename);
             _resultWriter.Initialize();
 
-            _historyEnumerator = new HistoryEnumerator(historyLoader);
             _isSimulationDone = false;
+
+            _liquidityEngine = new SimulationLiquidityEngineMoq(_dependencyFactory);
         }
 
         private void LoadOrderBookHistoryEventsIntoEngine(object sender, EventArgs<ISimEvent> args)
@@ -97,7 +109,7 @@ namespace Sowalabs.Bison.ProfitSim
             {
 
                 _engine.AddEvent(new OrderBookEvent(firstOrderBook, _dependencyFactory.BitcoinMarketApi));
-                _scenario.Customers.ForEach(customer => customer.CreateEvents(_dependencyFactory, firstOrderBook.AcqTime).ForEach(simEvent => _engine.AddEvent(simEvent)));
+                _scenario.Customers.ForEach(customer => customer.CreateEvents(_dependencyFactory, _liquidityEngine, firstOrderBook.AcqTime).ForEach(simEvent => _engine.AddEvent(simEvent)));
 
                 _engine.Simulate();
 

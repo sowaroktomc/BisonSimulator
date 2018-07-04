@@ -2,8 +2,10 @@
 {
     public interface IBankApi
     {
+        decimal GetAccountBalance(string accountNumber);
 
-        void TransferMoney(string fromAccount, string toAccount, decimal amount);
+        string TransferMoney(string fromAccount, string toAccount, decimal amount, string fromReference, string toReference);
 
+        BankTransactionStatusResponse GetTransactionStatus(string bankTransactionId);
     }
 }

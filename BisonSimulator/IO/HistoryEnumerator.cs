@@ -13,6 +13,7 @@ namespace Sowalabs.Bison.ProfitSim.IO
         private readonly BitstampHistoryLoader _loader;
         private readonly object _locker = new object();
         private int? _lastPeriodSynchronizationToken;
+        private bool _hasNoMoreData;
         private readonly LinkedList<OrderBook> _history = new LinkedList<OrderBook>();
 
 
@@ -46,6 +47,36 @@ namespace Sowalabs.Bison.ProfitSim.IO
         /// <returns>Next order book entry or null if no more is available.</returns>
         public OrderBook GetNext()
         {
+            if (_hasNoMoreData)
+            {
+                return null;
+            }
+
+            var nextNode = PrepareNextNode();
+            lock (_locker)
+            {
+                _currentNode = nextNode;
+                return _currentNode?.Value;
+            }
+        }
+
+        /// <summary>
+        /// Peeks next order book entry from history but does not move iterator to next entry. If no more historical data is available, returns null.
+        /// </summary>
+        /// <returns>Next order book entry or null if no more is available.</returns>
+        public OrderBook PeekNext()
+        {
+            if (_hasNoMoreData)
+            {
+                return null;
+            }
+
+            var nextNode = PrepareNextNode();
+            return nextNode?.Value;
+        }
+
+        private LinkedListNode<OrderBook> PrepareNextNode()
+        {
             LinkedListNode<OrderBook> nextNode;
             int? periodSynchronizationToken;
             lock (_locker)
@@ -58,14 +89,14 @@ namespace Sowalabs.Bison.ProfitSim.IO
             {
                 if (!_loader.LoadData(periodSynchronizationToken))
                 {
+                    _hasNoMoreData = true;
                     return null;
                 }
             }
 
             lock (_locker)
             {
-                _currentNode = _currentNode != null ? _currentNode.Next : _history.First;
-                return _currentNode?.Value;
+                return _currentNode != null ? _currentNode.Next : _history.First;
             }
         }
         
@@ -82,6 +113,7 @@ namespace Sowalabs.Bison.ProfitSim.IO
             {
                 _history.RemoveFirst();
                 _currentNode = null;
+                _hasNoMoreData = false;
 
                 historyCount = _history.Count;
                 periodSynchronizationToken = _lastPeriodSynchronizationToken;

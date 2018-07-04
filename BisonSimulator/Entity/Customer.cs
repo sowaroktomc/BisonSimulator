@@ -71,9 +71,10 @@ namespace Sowalabs.Bison.ProfitSim.Entity
         /// Create a list of simulation events which simulate customer's behaviour.
         /// </summary>
         /// <param name="dependencyFactory">Dependency factory to be used during events creation.</param>
+        /// <param name="liquidityEngine">Engine responsible for executing money and crypto transfers.</param>
         /// <param name="simStart">At what time does the current simulated time period start.</param>
         /// <returns>List of simulation events which simulate customer's behaviour.</returns>
-        public List<ISimEvent> CreateEvents(SimulationDependencyFactory dependencyFactory, DateTime simStart)
+        public List<ISimEvent> CreateEvents(SimulationDependencyFactory dependencyFactory, LiquidityEngine.LiquidityEngine liquidityEngine, DateTime simStart)
         {
             var events = new List<ISimEvent>();
 
@@ -89,7 +90,7 @@ namespace Sowalabs.Bison.ProfitSim.Entity
             var acceptRejectDelay = simStart.AddSeconds(RequestDelay + AcceptRejectDelay);
             if (AcceptsOffer)
             {
-                events.Add(new OfferAcceptedEvent(dependencyFactory, priceRequest, acceptRejectDelay));
+                events.Add(new OfferAcceptedEvent(dependencyFactory, liquidityEngine, priceRequest, acceptRejectDelay));
             }
             else
             {

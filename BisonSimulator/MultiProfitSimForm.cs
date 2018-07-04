@@ -94,6 +94,7 @@ namespace Sowalabs.Bison.ProfitSim
 
         private void LoadConfigButton_Click(object sender, EventArgs e)
         {
+
             if (_openFileDialog.ShowDialog(this) != DialogResult.OK)
             {
                 return;

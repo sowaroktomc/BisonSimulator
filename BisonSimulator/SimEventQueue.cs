@@ -28,19 +28,24 @@ namespace Sowalabs.Bison.ProfitSim
 
             private int GetPriority(ISimEvent simEvent)
             {
-                if (simEvent is OrderBookEvent)
+                if (simEvent is BlockSimulationEvent)
                 {
                     return 1;
                 }
 
-                if (simEvent is NewPriceRequestEvent)
+                if (simEvent is OrderBookEvent)
                 {
                     return 2;
                 }
 
-                if (simEvent is MarketTradeEvent)
+                if (simEvent is NewPriceRequestEvent)
                 {
                     return 3;
+                }
+
+                if (simEvent is MarketTradeEvent)
+                {
+                    return 4;
                 }
 
                 return 10;
@@ -125,5 +130,6 @@ namespace Sowalabs.Bison.ProfitSim
         {
             return _queue.Count == 0 ? null : _queue[0].Event;
         }
+
     }
 }

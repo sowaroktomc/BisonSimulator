@@ -29,15 +29,24 @@ namespace Sowalabs.Bison.ProfitSim.Dependencies
         public SimTimer(SimulationEngine engine)
         {
             _engine = engine;
-        } 
+        }
 
         /// <summary>
         /// Starts timer -> adds a timer event into simulation engine.
         /// </summary>
         public void Start()
         {
-            _event = new TimerEvent(_engine.CurrentTime.AddMilliseconds(Interval), Action);
+            _event = new TimerEvent(_engine.CurrentTime.AddMilliseconds(Interval), FireTimer);
             _engine.AddEvent(_event);
+        }
+
+        /// <summary>
+        /// Executes timer action.
+        /// </summary>
+        private void FireTimer()
+        {
+            Action();
+            _event = null;
         }
 
         /// <summary>
@@ -45,6 +54,11 @@ namespace Sowalabs.Bison.ProfitSim.Dependencies
         /// </summary>
         public void Stop()
         {
+            if (_event == null)
+            {
+                return;
+            }
+
             _engine.CancelEvent(_event);
             _event = null;
         }
@@ -54,10 +68,7 @@ namespace Sowalabs.Bison.ProfitSim.Dependencies
         /// </summary>
         public void Dispose()
         {
-            if (_event != null)
-            {
-                Stop();
-            }
+            Stop();
         }
     }
 }
